@@ -6,7 +6,7 @@ cc_flags = -g -std=c++11
 bin_folder := bin
 src_folder := src
 
-out := $(bin_folder)/main
+out := $(bin_folder)/main.out
 
 
 # build
