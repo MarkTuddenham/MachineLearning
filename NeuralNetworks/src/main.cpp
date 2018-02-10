@@ -46,15 +46,15 @@ int main() {
 
   int start_s=clock();
   //train many set
-  for (size_t i = 0; i < 100000; i++) {
+  for (size_t i = 0; i < 1000000; i++) {
     double inp[] = {(double)(std::rand()%2),(double)(std::rand()%2)};
     double t[] = {f(inp[0],inp[1])};
     // std::cout << inp[0] << ":" << inp[1] << "  =  " << t[0] << '\n';
-    nn.backpropagation(inp, t, 5);
+    nn.backpropagation(inp, t, 0.5);
   }
   int stop_s=clock();
-  std::cout<< "~~~~~~~~~~~~~~~NN Trained~~~~~~~~~~~~~\n";
-  std::cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)<< "s\n";
+  std::cout<< "~~~~~~~~ NN Trained ";
+  std::cout << "in " << (stop_s-start_s)/double(CLOCKS_PER_SEC)<< "s ~~~~~~~~\n";
 
 
 
