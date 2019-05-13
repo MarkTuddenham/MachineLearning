@@ -56,10 +56,10 @@ Matrix Matrix::transpose(void) const
   return t;
 }
 
-Matrix Matrix::operator~() const
-{
-  return this->transpose();
-}
+// Matrix Matrix::operator~() const
+// {
+//   return this->transpose();
+// }
 
 Matrix Matrix::add(const Matrix &m) const
 {
@@ -234,7 +234,8 @@ unsigned int Matrix::getCols() const
   return this->cols;
 }
 
-void Matrix::setName(std::string name)
+Matrix Matrix::setName(std::string name)
 {
   this->name = name;
+  return *this;
 }

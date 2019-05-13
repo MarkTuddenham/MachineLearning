@@ -18,12 +18,13 @@ private:
 public:
   Matrix(int rows, int cols, double fill = 0, std::string name = "M");
 
+  Matrix setName(std::string name);
   Matrix randomise(void);
+  unsigned int getRows() const;
+  unsigned int getCols() const;
 
   Matrix multiply(const Matrix &) const;
   Matrix operator*(const Matrix &)const;
-  Matrix transpose(void) const;
-  Matrix operator~() const;
   Matrix add(const Matrix &) const;
   Matrix operator+(const Matrix &) const;
   Matrix subtract(const Matrix &) const;
@@ -31,15 +32,12 @@ public:
 
   Matrix hadamard(const Matrix &) const;
   // Matrix operator->*(const Matrix&) const;
+  Matrix transpose(void) const;
+  // Matrix operator~() const;
 
   Matrix apply(std::function<double(double)> f) const;
-
   std::vector<double> flatten(void) const;
-
   void print(int precision = 3, std::ostream *op = &std::cout) const;
-  unsigned int getRows() const;
-  unsigned int getCols() const;
-  void setName(std::string name);
 
   static Matrix fromArray(const std::vector<double> &);
   static Matrix ones(unsigned int, unsigned int);
