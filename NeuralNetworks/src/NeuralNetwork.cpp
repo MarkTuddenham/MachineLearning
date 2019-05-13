@@ -12,10 +12,9 @@ NeuralNetwork::NeuralNetwork(std::vector<int> layers) : layers(layers)
   //TODO check layers cout >=3 or 2?
   for (unsigned int i = 1; i < layers.size(); i++)
   {
-    this->w.push_back(Matrix(layers[i], layers[i - 1]).randomise());
 
-    // this->w.push_back(Matrix(layers[i], layers[i - 1]).randomise());
-    // this->b.push_back(Matrix(layers[i], 1).randomise());
+    this->w.push_back(Matrix(layers[i - 1], layers[i]).randomise());
+    this->b.push_back(Matrix(1, layers[i]).randomise());
   }
 };
 
@@ -25,18 +24,20 @@ Matrix NeuralNetwork::feedforward(const Matrix &inputs)
   // turn inp array into matrix to calculate feedforward
   // call it out to use as first instance in the loop
 
-  Matrix out = inputs.transpose();
+  // TODO Copy properly
+  Matrix out = inputs;
   out.setName("inp");
   this->outs.push_back(out);
 
   for (unsigned int i = 0; i < layers.size() - 1; i++)
   {
-    Matrix net = (w[i] * out); // + b[i];
+    Matrix net = (out * w[i]) + b[i];
     out = NeuralNetwork::applyActivationFunction(net, NeuralNetwork::Sigmoid);
+
     out.setName("out_" + std::to_string(i + 1));
     this->outs.push_back(out);
   }
-  out.setName("Out");
+  out.setName("Output");
   return out;
 }
 
