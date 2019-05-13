@@ -11,12 +11,12 @@ TMP_PATH := ./tmp/
 BUILD_PATH := ./build/
 SRC_PATH := ./src/
 INC_PATH := -I ./include
-# CLEAN_IGNORE = "makefile|.git|.gitignore|.vscode|README.md"
 
-TARGET := run.out
+TARGET := exec
 
 # Files to compile
 OBJS = Matrix.o NeuralNetwork.o main.o
+
 OBJ = $(patsubst %,$(BUILD_PATH)%,$(OBJS))
 
 
