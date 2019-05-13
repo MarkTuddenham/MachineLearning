@@ -13,6 +13,7 @@ public:
   NeuralNetwork(std::vector<int>);
   Matrix feedforward(const Matrix &);
   void backpropagation(const Matrix &, const Matrix &, double);
+  void print(int precision = 3, std::ostream *op = &std::cout);
 
   enum ActivationFunction
   {

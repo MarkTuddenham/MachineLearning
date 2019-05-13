@@ -11,11 +11,11 @@ NeuralNetwork::NeuralNetwork(std::vector<int> layers) : layers(layers)
 
   //TODO validate number of layers cout >=3 or 2?
 
-  for (unsigned int i = 1; i < layers.size(); i++)
+  for (size_t i = 1; i < layers.size(); i++)
   {
 
-    this->w.push_back(Matrix(layers[i - 1], layers[i]).randomise());
-    this->b.push_back(Matrix(1, layers[i]).randomise());
+    this->w.push_back(Matrix(layers[i - 1], layers[i]).randomise().setName("w_" + std::to_string(i)));
+    this->b.push_back(Matrix(1, layers[i]).randomise().setName("b_" + std::to_string(i)));
   }
 };
 
@@ -30,7 +30,7 @@ Matrix NeuralNetwork::feedforward(const Matrix &inputs)
   out.setName("inp");
   this->outs.push_back(out);
 
-  for (unsigned int i = 0; i < layers.size() - 1; i++)
+  for (size_t i = 0; i < layers.size() - 1; i++)
   {
     Matrix net = (out * w[i]) + b[i];
     out = NeuralNetwork::applyActivationFunction(net, NeuralNetwork::Sigmoid);
@@ -58,26 +58,42 @@ void NeuralNetwork::backpropagation(const Matrix &inputs, const Matrix &targets,
     return m.hadamard(Matrix::ones(m.getRows(), m.getCols()) - m);
   };
 
-  std::vector<Matrix> w_e;
+  std::vector<Matrix> w_e, b_e;
   //weight to output layers (H_N->O) are computed with a different node delta
   unsigned int N = layers.size() - 1;
   Matrix node_delta = (outs[N] - targets).hadamard(delta_activ(outs[N]));
   w_e.insert(w_e.begin(), (outs[N - 1].transpose() * node_delta).hadamard(lr));
+  b_e.insert(b_e.begin(), node_delta.hadamard(lr));
 
   // loop to compute node deltas and weight error responsibilities from input to last hidden layer (I->H_[N-1])
-  for (unsigned int i = layers.size() - 2; i > 0; i--)
+  for (size_t i = layers.size() - 2; i > 0; i--)
   {
     node_delta = (node_delta * w[i].transpose()).hadamard(delta_activ(outs[i]));
     w_e.insert(w_e.begin(), (outs[i - 1].transpose() * node_delta).hadamard(lr));
+    b_e.insert(b_e.begin(), node_delta.hadamard(lr));
   }
 
-  //update weights
-  for (unsigned int i = 0; i < w.size(); i++)
+  // update weights
+  // Sum and reset names
+  for (size_t i = 0; i < w.size(); i++)
   {
     // std::cout << "w[i] = " << w[i].getRows() << "x" << w[i].getCols() << std::endl;
     // std::cout << "w_e[i] = " << w_e[i].getRows() << "x" << w_e[i].getCols() << std::endl;
-    w[i] = w[i] - w_e[i];
+    w[i] = (w[i] - w_e[i]).setName("w_" + std::to_string(i + 1));
+    b[i] = (b[i] - b_e[i]).setName("b_" + std::to_string(i + 1));
   }
+}
+
+void NeuralNetwork::print(int precision, std::ostream *op)
+{
+  *op << "~~~~~~~~~~ # Neural Network # ~~~~~~~~~~" << std::endl;
+
+  for (size_t i = 0; i < this->w.size(); i++)
+  {
+    this->w[i].print(precision, op);
+    this->b[i].print(precision, op);
+  }
+  *op << "~~~~~~~~~~ # ~~~~~~~~~~~~~~ # ~~~~~~~~~~" << std::endl;
 }
 
 Matrix NeuralNetwork::applyActivationFunction(const Matrix &m, ActivationFunction af)
