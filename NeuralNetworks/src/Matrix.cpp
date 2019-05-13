@@ -182,6 +182,16 @@ Matrix Matrix::fromArray(const std::vector<double> &arr)
   return m;
 }
 
+Matrix Matrix::ones(unsigned int rows, unsigned int cols)
+{
+  return Matrix(rows, cols, 1);
+}
+
+Matrix Matrix::zeros(unsigned int rows, unsigned int cols)
+{
+  return Matrix(rows, cols, 0);
+}
+
 std::vector<double> Matrix::flatten(void) const
 {
   std::vector<double> flat;

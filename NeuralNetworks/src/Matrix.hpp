@@ -42,4 +42,6 @@ public:
   void setName(std::string name);
 
   static Matrix fromArray(const std::vector<double> &);
+  static Matrix ones(unsigned int, unsigned int);
+  static Matrix zeros(unsigned int, unsigned int);
 };
