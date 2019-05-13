@@ -6,10 +6,11 @@
 
 NeuralNetwork::NeuralNetwork(std::vector<int> layers) : layers(layers)
 {
-  // Compute initial weights & biases
+  // Initialise weights & biases
   // inp layer + hidden layers + out layer
 
-  //TODO check layers cout >=3 or 2?
+  //TODO validate number of layers cout >=3 or 2?
+
   for (unsigned int i = 1; i < layers.size(); i++)
   {
 
@@ -43,9 +44,12 @@ Matrix NeuralNetwork::feedforward(const Matrix &inputs)
 
 void NeuralNetwork::backpropagation(const Matrix &inputs, const Matrix &targets, double eta = 0.1)
 {
+
+  Matrix lr = Matrix(1, 1, eta); // Learning rate as a matrix
+
   //compute total error
   feedforward(inputs);
-  Matrix t = targets.transpose();
+  // Matrix t = targets.transpose();
 
   // calculate weight errors
 
@@ -56,20 +60,22 @@ void NeuralNetwork::backpropagation(const Matrix &inputs, const Matrix &targets,
 
   std::vector<Matrix> w_e;
   //weight to output layers (H_N->O) are computed with a different node delta
-  int N = layers.size() - 1;
-  Matrix node_delta = (outs[N] - t).hadamard(delta_activ(outs[N]));
-  w_e.insert(w_e.begin(), Matrix(1, 1, eta).hadamard(node_delta * ~outs[N - 1]));
+  unsigned int N = layers.size() - 1;
+  Matrix node_delta = (outs[N] - targets).hadamard(delta_activ(outs[N]));
+  w_e.insert(w_e.begin(), lr.hadamard(outs[N - 1].transpose() * node_delta));
 
   // loop to compute node deltas and weight error responsibilities from input to last hidden layer (I->H_[N-1])
   for (unsigned int i = layers.size() - 2; i > 0; i--)
   {
-    node_delta = ((~w[i]) * node_delta).hadamard(delta_activ(outs[i]));
-    w_e.insert(w_e.begin(), Matrix(1, 1, eta).hadamard(node_delta * ~outs[i - 1]));
+    node_delta = (node_delta * w[i].transpose()).hadamard(delta_activ(outs[i]));
+    w_e.insert(w_e.begin(), (outs[i - 1].transpose() * node_delta).hadamard(lr));
   }
 
   //update weights
   for (unsigned int i = 0; i < w.size(); i++)
   {
+    // std::cout << "w[i] = " << w[i].getRows() << "x" << w[i].getCols() << std::endl;
+    // std::cout << "w_e[i] = " << w_e[i].getRows() << "x" << w_e[i].getCols() << std::endl;
     w[i] = w[i] - w_e[i];
   }
 }
