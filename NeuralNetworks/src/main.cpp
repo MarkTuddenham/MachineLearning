@@ -3,11 +3,14 @@
 #include <iostream>
 #include <cstdlib>
 
+using std::cout;
+using std::endl;
 
-int main() {
-  std::cout << "Neural Networks :)"  << '\n';
+int main()
+{
+  std::cout << "Neural Networks :)" << '\n';
 
-  // Test matricies
+  // Test matrices
 
   // Matrix m1(2,2,1.4,"M1");
   // Matrix m2(2,2);
@@ -19,22 +22,19 @@ int main() {
   // m1.multiply(m2).print();
   // NeuralNetwork::applyActivationFunction(m1,NeuralNetwork::Sigmoid).print();
 
-
-  //define nn architecure
-  std::vector<int> layers = {2,3,1};
+  //define nn architecture
+  std::vector<int> layers = {2, 3, 2};
   //make nn
   NeuralNetwork nn(layers);
 
-
-  std::function<double(double, double)> f = [](double d1,double d2){
-    if (d1==d2){
-      return 0.0;
-    }else{
-      return 1.0;
-    }};
+  auto f = [](const Matrix &m) {
+    auto flat = m.flatten();
+    return (flat.front() == flat.back()) ? Matrix::fromArray({0.0, 1.0}) : Matrix::fromArray({1.0, 0.0});
+  };
 
   //test on some random inputs
-  double inp1[] = {0.0,0.0}, inp2[] = {1.0,0.0}, inp3[] = {0.0,1.0}, inp4[] = {1.0,1.0};
+  Matrix inp1 = Matrix::fromArray({0.0, 0.0}), inp2 = Matrix::fromArray({1.0, 0.0}), inp3 = Matrix::fromArray({0.0, 1.0}), inp4 = Matrix::fromArray({1.0, 1.0});
+
   Matrix o = nn.feedforward(inp1);
   o.print(7);
   o = nn.feedforward(inp2);
@@ -44,19 +44,21 @@ int main() {
   o = nn.feedforward(inp4);
   o.print(7);
 
-  int start_s=clock();
-  //train many set
-  for (size_t i = 0; i < 1000000; i++) {
-    double inp[] = {(double)(std::rand()%2),(double)(std::rand()%2)};
-    double t[] = {f(inp[0],inp[1])};
+  int start_s = clock();
+  
+  //train many sets
+  for (unsigned int i = 0; i < 1'000; i++)
+  {
+    Matrix inp = Matrix::fromArray({(double)(std::rand() % 2), (double)(std::rand() % 2)});
+    Matrix t = f(inp);
     // std::cout << inp[0] << ":" << inp[1] << "  =  " << t[0] << '\n';
-    nn.backpropagation(inp, t, 0.5);
+
+    nn.backpropagation(inp, t, 1.5);
   }
-  int stop_s=clock();
-  std::cout<< "~~~~~~~~ NN Trained ";
-  std::cout << "in " << (stop_s-start_s)/double(CLOCKS_PER_SEC)<< "s ~~~~~~~~\n";
 
-
+  int stop_s = clock();
+  std::cout << "~~~~~~~~ NN Trained ";
+  std::cout << "in " << (stop_s - start_s) / double(CLOCKS_PER_SEC) << "s ~~~~~~~~\n";
 
   //test on same inputs
   o = nn.feedforward(inp1);
@@ -68,7 +70,5 @@ int main() {
   o = nn.feedforward(inp4);
   o.print(7);
 
-
   return 0;
 }
-
