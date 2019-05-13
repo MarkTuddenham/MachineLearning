@@ -55,14 +55,14 @@ void NeuralNetwork::backpropagation(const Matrix &inputs, const Matrix &targets,
 
   //TODO only sigmoid atm
   std::function<Matrix(Matrix)> delta_activ = [](Matrix m) {
-    return m.hadamard(Matrix(m.getRows(), m.getCols(), 1) - m);
+    return m.hadamard(Matrix::ones(m.getRows(), m.getCols()) - m);
   };
 
   std::vector<Matrix> w_e;
   //weight to output layers (H_N->O) are computed with a different node delta
   unsigned int N = layers.size() - 1;
   Matrix node_delta = (outs[N] - targets).hadamard(delta_activ(outs[N]));
-  w_e.insert(w_e.begin(), lr.hadamard(outs[N - 1].transpose() * node_delta));
+  w_e.insert(w_e.begin(), (outs[N - 1].transpose() * node_delta).hadamard(lr));
 
   // loop to compute node deltas and weight error responsibilities from input to last hidden layer (I->H_[N-1])
   for (unsigned int i = layers.size() - 2; i > 0; i--)
