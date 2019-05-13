@@ -23,19 +23,23 @@ int main()
   // NeuralNetwork::applyActivationFunction(m1,NeuralNetwork::Sigmoid).print();
 
   //define nn architecture
-  std::vector<int> layers = {2, 3, 2};
+  std::vector<int> layers = {2, 4, 2};
   //make nn
-  NeuralNetwork nn(layers);
+  NeuralNetwork<double> nn(layers);
+  nn.print();
 
-  auto f = [](const Matrix &m) {
+  auto f = [](const Matrix<double> &m) {
     auto flat = m.flatten();
-    return (flat.front() == flat.back()) ? Matrix::fromArray({0.0, 1.0}) : Matrix::fromArray({1.0, 0.0});
+    return (flat.front() == flat.back()) ? Matrix<double>::fromArray({0.0, 1.0}) : Matrix<double>::fromArray({1.0, 0.0});
   };
 
   //test on some random inputs
-  Matrix inp1 = Matrix::fromArray({0.0, 0.0}), inp2 = Matrix::fromArray({1.0, 0.0}), inp3 = Matrix::fromArray({0.0, 1.0}), inp4 = Matrix::fromArray({1.0, 1.0});
+  Matrix<double> inp1 = Matrix<double>::fromArray({0.0, 0.0});
+  Matrix<double> inp2 = Matrix<double>::fromArray({1.0, 0.0});
+  Matrix<double> inp3 = Matrix<double>::fromArray({0.0, 1.0});
+  Matrix<double> inp4 = Matrix<double>::fromArray({1.0, 1.0});
 
-  Matrix o = nn.feedforward(inp1);
+  Matrix<double> o = nn.feedforward(inp1);
   o.print(7);
   o = nn.feedforward(inp2);
   o.print(7);
@@ -45,20 +49,25 @@ int main()
   o.print(7);
 
   int start_s = clock();
-  
-  //train many sets
-  for (unsigned int i = 0; i < 1'000; i++)
-  {
-    Matrix inp = Matrix::fromArray({(double)(std::rand() % 2), (double)(std::rand() % 2)});
-    Matrix t = f(inp);
-    // std::cout << inp[0] << ":" << inp[1] << "  =  " << t[0] << '\n';
 
+  //train many sets
+  for (unsigned int i = 0; i < 100'000; i++)
+  {
+    Matrix<double> inp = Matrix<double>::fromArray({(double)(std::rand() % 2), (double)(std::rand() % 2)});
+    Matrix<double> t = f(inp);
+    // std::cout << inp[0] << ":" << inp[1] << "  =  " << t[0] << '\n';
     nn.backpropagation(inp, t, 1.5);
   }
 
   int stop_s = clock();
-  std::cout << "~~~~~~~~ NN Trained ";
-  std::cout << "in " << (stop_s - start_s) / double(CLOCKS_PER_SEC) << "s ~~~~~~~~\n";
+  cout << std::endl
+       << "~~~~~~~~ NN Trained "
+       << "in "
+       << (stop_s - start_s) / double(CLOCKS_PER_SEC)
+       << "s ~~~~~~~~"
+       << std::endl;
+
+  nn.print();
 
   //test on same inputs
   o = nn.feedforward(inp1);

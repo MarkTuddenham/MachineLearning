@@ -4,7 +4,8 @@
 #include <functional>
 #include <cmath>
 
-NeuralNetwork::NeuralNetwork(std::vector<int> layers) : layers(layers)
+template <typename T>
+NeuralNetwork<T>::NeuralNetwork(std::vector<int> layers) : layers(layers)
 {
   // Initialise weights & biases
   // inp layer + hidden layers + out layer
@@ -14,25 +15,26 @@ NeuralNetwork::NeuralNetwork(std::vector<int> layers) : layers(layers)
   for (size_t i = 1; i < layers.size(); i++)
   {
 
-    this->w.push_back(Matrix(layers[i - 1], layers[i]).randomise().setName("w_" + std::to_string(i)));
-    this->b.push_back(Matrix(1, layers[i]).randomise().setName("b_" + std::to_string(i)));
+    this->w.push_back(Matrix<T>(layers[i - 1], layers[i]).randomise().setName("w_" + std::to_string(i)));
+    this->b.push_back(Matrix<T>(1, layers[i]).randomise().setName("b_" + std::to_string(i)));
   }
 };
 
-Matrix NeuralNetwork::feedforward(const Matrix &inputs)
+template <typename T>
+Matrix<T> NeuralNetwork<T>::feedforward(const Matrix<T> &inputs)
 {
   this->outs.clear();
   // turn inp array into matrix to calculate feedforward
   // call it out to use as first instance in the loop
 
   // TODO Copy properly
-  Matrix out = inputs;
+  Matrix<T> out = inputs;
   out.setName("inp");
   this->outs.push_back(out);
 
   for (size_t i = 0; i < layers.size() - 1; i++)
   {
-    Matrix net = (out * w[i]) + b[i];
+    Matrix<T> net = (out * w[i]) + b[i];
     out = NeuralNetwork::applyActivationFunction(net, NeuralNetwork::Sigmoid);
 
     out.setName("out_" + std::to_string(i + 1));
@@ -42,10 +44,11 @@ Matrix NeuralNetwork::feedforward(const Matrix &inputs)
   return out;
 }
 
-void NeuralNetwork::backpropagation(const Matrix &inputs, const Matrix &targets, double eta = 0.1)
+template <typename T>
+void NeuralNetwork<T>::backpropagation(const Matrix<T> &inputs, const Matrix<T> &targets, T eta)
 {
 
-  Matrix lr = Matrix(1, 1, eta); // Learning rate as a matrix
+  Matrix<T> lr = Matrix<T>(1, 1, eta); // Learning rate as a matrix
 
   //compute total error
   feedforward(inputs);
@@ -54,14 +57,14 @@ void NeuralNetwork::backpropagation(const Matrix &inputs, const Matrix &targets,
   // calculate weight errors
 
   //TODO only sigmoid atm
-  std::function<Matrix(Matrix)> delta_activ = [](Matrix m) {
-    return m.hadamard(Matrix::ones(m.getRows(), m.getCols()) - m);
+  std::function<Matrix<T>(Matrix<T>)> delta_activ = [](Matrix<T> m) {
+    return m.hadamard(Matrix<T>::ones(m.getRows(), m.getCols()) - m);
   };
 
-  std::vector<Matrix> w_e, b_e;
+  std::vector<Matrix<T>> w_e, b_e;
   //weight to output layers (H_N->O) are computed with a different node delta
   unsigned int N = layers.size() - 1;
-  Matrix node_delta = (outs[N] - targets).hadamard(delta_activ(outs[N]));
+  Matrix<T> node_delta = (outs[N] - targets).hadamard(delta_activ(outs[N]));
   w_e.insert(w_e.begin(), (outs[N - 1].transpose() * node_delta).hadamard(lr));
   b_e.insert(b_e.begin(), node_delta.hadamard(lr));
 
@@ -84,36 +87,44 @@ void NeuralNetwork::backpropagation(const Matrix &inputs, const Matrix &targets,
   }
 }
 
-void NeuralNetwork::print(int precision, std::ostream *op)
+template <typename T>
+void NeuralNetwork<T>::print(int precision, std::ostream *op)
 {
-  *op << "~~~~~~~~~~ # Neural Network # ~~~~~~~~~~" << std::endl;
+  *op << std::endl
+      << "~~~~~~~~~~ # Neural Network # ~~~~~~~~~~"
+      << std::endl;
 
   for (size_t i = 0; i < this->w.size(); i++)
   {
     this->w[i].print(precision, op);
+    *op << std::endl;
     this->b[i].print(precision, op);
+    *op << std::endl;
   }
-  *op << "~~~~~~~~~~ # ~~~~~~~~~~~~~~ # ~~~~~~~~~~" << std::endl;
+  *op << "~~~~~~~~~~ # ~~~~~~~~~~~~~~ # ~~~~~~~~~~"
+      << std::endl
+      << std::endl;
 }
 
-Matrix NeuralNetwork::applyActivationFunction(const Matrix &m, ActivationFunction af)
+template <typename T>
+Matrix<T> NeuralNetwork<T>::applyActivationFunction(const Matrix<T> &m, ActivationFunction af)
 {
   std::function<double(double)> f;
 
   switch (af)
   {
   case Sigmoid:
-    f = [](double d) {
+    f = [](T d) {
       return 1 / (1 + std::exp(-d));
     };
     break;
   case FastSigmoid:
-    f = [](double d) {
+    f = [](T d) {
       return d / (1 + std::abs(d));
     };
     break;
   case Tanh:
-    f = [](double d) {
+    f = [](T d) {
       return std::tanh(d);
     };
     break;
@@ -123,3 +134,6 @@ Matrix NeuralNetwork::applyActivationFunction(const Matrix &m, ActivationFunctio
   }
   return m.apply(f);
 }
+
+template class NeuralNetwork<float>;
+template class NeuralNetwork<double>;

@@ -3,16 +3,17 @@
 #include "Matrix.hpp"
 #include <vector>
 
+template <typename T = double>
 class NeuralNetwork
 {
 private:
   const std::vector<int> layers;
-  std::vector<Matrix> w, b, outs;
+  std::vector<Matrix<T>> w, b, outs;
 
 public:
   NeuralNetwork(std::vector<int>);
-  Matrix feedforward(const Matrix &);
-  void backpropagation(const Matrix &, const Matrix &, double);
+  Matrix<T> feedforward(const Matrix<T> &);
+  void backpropagation(const Matrix<T> &, const Matrix<T> &, T eta);
   void print(int precision = 3, std::ostream *op = &std::cout);
 
   enum ActivationFunction
@@ -21,5 +22,5 @@ public:
     FastSigmoid,
     Tanh
   };
-  static Matrix applyActivationFunction(const Matrix &, ActivationFunction);
+  static Matrix<T> applyActivationFunction(const Matrix<T> &, ActivationFunction);
 };
