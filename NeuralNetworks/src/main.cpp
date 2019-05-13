@@ -51,7 +51,7 @@ int main()
   int start_s = clock();
 
   //train many sets
-  for (unsigned int i = 0; i < 100'000; i++)
+  for (unsigned int i = 0; i < 1'000; i++)
   {
     Matrix<double> inp = Matrix<double>::fromArray({(double)(std::rand() % 2), (double)(std::rand() % 2)});
     Matrix<double> t = f(inp);
