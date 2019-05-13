@@ -111,19 +111,33 @@ Matrix Matrix::randomise(void)
 //~~~~~~~~~~~~~~~~~HELPERS~~~~~~~~~~~~~~~~~~~~~~~~~
 Matrix Matrix::elementwise(const Matrix &m, std::function<double(double, double)> f) const
 {
-  if (this->rows == 1 && this->cols == 1)
+  // Deal with scalar multiplication
+  bool amIScalar = this->getRows() == 1 && this->getCols() == 1;
+  bool isOtherScalar = m.getRows() == 1 && m.getCols() == 1;
+
+  if (amIScalar || isOtherScalar)
   {
-    double n = this->d[0][0];
-    Matrix t(m.rows, m.cols);
+
+    // if other is scalar then swap
+
+    double n = amIScalar ? this->flatten()[0] : m.flatten()[0];
+    unsigned int rows = amIScalar ? m.getRows() : this->getRows();
+    unsigned int cols = amIScalar ? m.getCols() : this->getCols();
+
+    Matrix t(rows, cols);
     for (unsigned int i = 0; i < t.rows; i++)
     {
       for (unsigned int j = 0; j < t.cols; j++)
       {
-        t.d[i][j] = f(n, m.d[i][j]);
+        t.d[i][j] = f(
+            n,
+            (amIScalar ? m.d : this->d)[i][j]);
       }
     }
     return t;
   }
+
+  // n-D elementwise
 
   if (this->rows != m.rows || this->cols != m.cols)
   {
