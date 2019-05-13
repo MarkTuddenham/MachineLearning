@@ -51,12 +51,12 @@ int main()
   int start_s = clock();
 
   //train many sets
-  for (unsigned int i = 0; i < 100'000; i++)
+  for (unsigned int i = 0; i < 1'000; i++)
   {
     Matrix<double> inp = Matrix<double>::fromArray({(double)(std::rand() % 2), (double)(std::rand() % 2)});
     Matrix<double> t = f(inp);
     // std::cout << inp[0] << ":" << inp[1] << "  =  " << t[0] << '\n';
-    nn.backpropagation(inp, t, 1.5);
+    nn.backpropagation(inp, t, 4.5);
   }
 
   int stop_s = clock();
