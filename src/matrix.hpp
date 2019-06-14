@@ -17,7 +17,7 @@ private:
   Matrix<T> elementwise(const Matrix<T> &m, std::function<T(T, T)> f) const;
 
 public:
-  Matrix(int rows, int cols, T fill = 0, std::string name = "M");
+  Matrix(unsigned int rows, unsigned int cols, T fill = 0, std::string name = "M");
 
   Matrix<T> setName(std::string name);
   Matrix<T> randomise(void);

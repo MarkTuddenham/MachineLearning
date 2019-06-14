@@ -6,7 +6,7 @@
 #include <iomanip>
 
 template <typename T>
-Matrix<T>::Matrix(int rows, int cols, T fill, std::string name) : rows(rows), cols(cols), name(name)
+Matrix<T>::Matrix(unsigned int rows, unsigned int cols, T fill, std::string name) : rows(rows), cols(cols), name(name)
 {
   this->d = std::vector<std::vector<T>>(rows, std::vector<T>(cols, fill));
 }
@@ -257,7 +257,6 @@ Matrix<T> Matrix<T>::setName(std::string name)
   this->name = name;
   return *this;
 }
-
 
 template class Matrix<float>;
 template class Matrix<double>;
