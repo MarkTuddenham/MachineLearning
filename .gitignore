@@ -1,6 +1,17 @@
+### Custom ###
 .vscode
-exec
+build/
 
+# Executables
+ml
+run-tests
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Created by https://www.gitignore.io/api/c++
+# Edit at https://www.gitignore.io/?templates=c++
+
+### C++ ###
 # Prerequisites
 *.d
 
@@ -33,3 +44,5 @@ exec
 *.exe
 *.out
 *.app
+
+# End of https://www.gitignore.io/api/c++

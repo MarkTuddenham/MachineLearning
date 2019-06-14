@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Matrix.hpp"
+#include "matrix.hpp"
 #include <vector>
 
 template <typename T = double>

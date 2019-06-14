@@ -1,4 +1,4 @@
-#include "Matrix.hpp"
+#include "matrix.hpp"
 
 #include <stdexcept>
 #include <numeric>
@@ -9,7 +9,13 @@ template <typename T>
 Matrix<T>::Matrix(int rows, int cols, T fill, std::string name) : rows(rows), cols(cols), name(name)
 {
   this->d = std::vector<std::vector<T>>(rows, std::vector<T>(cols, fill));
-};
+}
+
+template <typename T>
+bool Matrix<T>::operator==(const Matrix<T> &m) const
+{
+  return this->d == m.d;
+}
 
 //~~~~~~~~~~~~~~~~~MATHS~~~~~~~~~~~~~~~~~~~~~~~~~
 // [this][m]
@@ -59,11 +65,6 @@ Matrix<T> Matrix<T>::transpose(void) const
   return t;
 }
 
-// Matrix Matrix::operator~() const
-// {
-//   return this->transpose();
-// }
-
 template <typename T>
 Matrix<T> Matrix<T>::add(const Matrix<T> &m) const
 {
@@ -93,10 +94,6 @@ Matrix<T> Matrix<T>::hadamard(const Matrix<T> &m) const
 {
   return this->elementwise(m, [](T a, T b) { return a * b; });
 }
-// Matrix Matrix::operator->*(const Matrix &m) const
-// {
-//   return this->hadamard(m);
-// }
 
 template <typename T>
 Matrix<T> Matrix<T>::randomise(void)
@@ -225,6 +222,7 @@ void Matrix<T>::print(int precision, std::ostream *op) const
 {
   if (this->name != "")
     *op << this->name << ": ";
+
   *op << this->rows << 'x' << this->cols << " Matrix:" << '\n';
   *op << std::setprecision(precision) << std::fixed;
 
@@ -239,7 +237,7 @@ void Matrix<T>::print(int precision, std::ostream *op) const
     }
     *op << " |\n";
   }
-};
+}
 
 template <typename T>
 unsigned int Matrix<T>::getRows() const
@@ -259,6 +257,7 @@ Matrix<T> Matrix<T>::setName(std::string name)
   this->name = name;
   return *this;
 }
+
 
 template class Matrix<float>;
 template class Matrix<double>;

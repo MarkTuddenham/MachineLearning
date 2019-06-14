@@ -1,8 +1,9 @@
-#include "NeuralNetwork.hpp"
-#include "Matrix.hpp"
+#include "neural_network.hpp"
 
 #include <functional>
 #include <cmath>
+
+#include "matrix.hpp"
 
 template <typename T>
 NeuralNetwork<T>::NeuralNetwork(std::vector<int> layers) : layers(layers)
@@ -18,7 +19,7 @@ NeuralNetwork<T>::NeuralNetwork(std::vector<int> layers) : layers(layers)
     this->w.push_back(Matrix<T>(layers[i - 1], layers[i]).randomise().setName("w_" + std::to_string(i)));
     this->b.push_back(Matrix<T>(1, layers[i]).randomise().setName("b_" + std::to_string(i)));
   }
-};
+}
 
 template <typename T>
 Matrix<T> NeuralNetwork<T>::feedforward(const Matrix<T> &inputs)

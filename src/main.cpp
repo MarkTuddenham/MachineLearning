@@ -1,26 +1,27 @@
-#include "Matrix.hpp"
-#include "NeuralNetwork.hpp"
 #include <iostream>
 #include <cstdlib>
+
+#include "matrix.hpp"
+#include "neural_network.hpp"
 
 using std::cout;
 using std::endl;
 
 int main()
 {
-  std::cout << "Neural Networks :)" << '\n';
+  std::cout << "Neural Networks :)\n";
 
   // Test matrices
 
-  // Matrix m1(2,2,1.4,"M1");
-  // Matrix m2(2,2);
+  // Matrix<double> m1(2, 2, 1.4, "M1");
+  // Matrix<double> m2(2, 2);
   // m1.randomise();
   // m2.randomise();
   // m1.print();
   // m2.print();
   // m1.add(m2).print();
   // m1.multiply(m2).print();
-  // NeuralNetwork::applyActivationFunction(m1,NeuralNetwork::Sigmoid).print();
+  // NeuralNetwork<double>::applyActivationFunction(m1, NeuralNetwork<double>::Sigmoid).print();
 
   //define nn architecture
   std::vector<int> layers = {2, 4, 2};
@@ -53,7 +54,7 @@ int main()
   //train many sets
   for (unsigned int i = 0; i < 1'000; i++)
   {
-    Matrix<double> inp = Matrix<double>::fromArray({(double)(std::rand() % 2), (double)(std::rand() % 2)});
+    Matrix<double> inp = Matrix<double>::fromArray({static_cast<double>(std::rand() % 2), static_cast<double>(std::rand() % 2)});
     Matrix<double> t = f(inp);
     // std::cout << inp[0] << ":" << inp[1] << "  =  " << t[0] << '\n';
     nn.backpropagation(inp, t, 4.5);
@@ -78,6 +79,4 @@ int main()
   o.print(7);
   o = nn.feedforward(inp4);
   o.print(7);
-
-  return 0;
 }
