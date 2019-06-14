@@ -12,6 +12,9 @@ private:
 
 public:
   NeuralNetwork(std::vector<int>);
+
+  const std::vector<int> &get_layers() const;
+
   Matrix<T> feedforward(const Matrix<T> &);
   void backpropagation(const Matrix<T> &, const Matrix<T> &, T eta);
   void print(int precision = 3, std::ostream *op = &std::cout);

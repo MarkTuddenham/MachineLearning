@@ -22,6 +22,12 @@ NeuralNetwork<T>::NeuralNetwork(std::vector<int> layers) : layers(layers)
 }
 
 template <typename T>
+const std::vector<int> &NeuralNetwork<T>::get_layers() const
+{
+  return this->layers;
+}
+
+template <typename T>
 Matrix<T> NeuralNetwork<T>::feedforward(const Matrix<T> &inputs)
 {
   this->outs.clear();
