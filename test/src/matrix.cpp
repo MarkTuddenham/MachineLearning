@@ -2,15 +2,16 @@
 #include <sstream>
 
 #include <matrix.hpp>
-#include <utils.hpp>
+
+#include "utils.hpp"
 
 TEST_CASE("Matrix Constructor", "[matrix]")
 {
     unsigned int n_rows = 5, n_cols = 3;
 
     Matrix<double> m = Matrix<double>(n_rows, n_cols);
-    REQUIRE(m.getRows() == n_rows);
-    REQUIRE(m.getCols() == n_cols);
+    REQUIRE(m.get_rows() == n_rows);
+    REQUIRE(m.get_cols() == n_cols);
 }
 
 TEST_CASE("Matrix Zeros", "[matrix]")
