@@ -7,8 +7,8 @@ template <typename T = double>
 class NeuralNetwork
 {
 private:
-  const std::vector<int> layers;
-  std::vector<Matrix<T>> w, b, outs;
+  const std::vector<int> m_layers;
+  std::vector<Matrix<T>> m_weights, m_biases, m_outs;
 
 public:
   NeuralNetwork(std::vector<int>);
@@ -19,11 +19,11 @@ public:
   void backpropagation(const Matrix<T> &, const Matrix<T> &, T eta);
   void print(int precision = 3, std::ostream *op = &std::cout);
 
-  enum ActivationFunction
+  enum Activation
   {
     Sigmoid,
     FastSigmoid,
     Tanh
   };
-  static Matrix<T> applyActivationFunction(const Matrix<T> &, ActivationFunction);
+  static Matrix<T> apply_activation(const Matrix<T> &, Activation);
 };

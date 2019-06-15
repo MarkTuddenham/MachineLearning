@@ -21,7 +21,7 @@ int main()
   // m2.print();
   // m1.add(m2).print();
   // m1.multiply(m2).print();
-  // NeuralNetwork<double>::applyActivationFunction(m1, NeuralNetwork<double>::Sigmoid).print();
+  // NeuralNetwork<double>::apply_activation(m1, NeuralNetwork<double>::Sigmoid).print();
 
   //define nn architecture
   std::vector<int> layers = {2, 4, 2};
@@ -31,14 +31,14 @@ int main()
 
   auto f = [](const Matrix<double> &m) {
     auto flat = m.flatten();
-    return (flat.front() == flat.back()) ? Matrix<double>::fromArray({0.0, 1.0}) : Matrix<double>::fromArray({1.0, 0.0});
+    return (flat.front() == flat.back()) ? Matrix<double>::from_array({0.0, 1.0}) : Matrix<double>::from_array({1.0, 0.0});
   };
 
   //test on some random inputs
-  Matrix<double> inp1 = Matrix<double>::fromArray({0.0, 0.0});
-  Matrix<double> inp2 = Matrix<double>::fromArray({1.0, 0.0});
-  Matrix<double> inp3 = Matrix<double>::fromArray({0.0, 1.0});
-  Matrix<double> inp4 = Matrix<double>::fromArray({1.0, 1.0});
+  Matrix<double> inp1 = Matrix<double>::from_array({0.0, 0.0});
+  Matrix<double> inp2 = Matrix<double>::from_array({1.0, 0.0});
+  Matrix<double> inp3 = Matrix<double>::from_array({0.0, 1.0});
+  Matrix<double> inp4 = Matrix<double>::from_array({1.0, 1.0});
 
   Matrix<double> o = nn.feedforward(inp1);
   o.print(7);
@@ -54,7 +54,7 @@ int main()
   //train many sets
   for (unsigned int i = 0; i < 1'000; i++)
   {
-    Matrix<double> inp = Matrix<double>::fromArray({static_cast<double>(std::rand() % 2), static_cast<double>(std::rand() % 2)});
+    Matrix<double> inp = Matrix<double>::from_array({static_cast<double>(std::rand() % 2), static_cast<double>(std::rand() % 2)});
     Matrix<double> t = f(inp);
     // std::cout << inp[0] << ":" << inp[1] << "  =  " << t[0] << '\n';
     nn.backpropagation(inp, t, 4.5);
