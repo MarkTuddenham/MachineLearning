@@ -6,14 +6,14 @@
 #include "matrix.hpp"
 
 template <typename T>
-NeuralNetwork<T>::NeuralNetwork(std::vector<int> t_layers) : m_layers(t_layers)
+NeuralNetwork<T>::NeuralNetwork(const std::vector<int> &t_layers) : m_layers(t_layers)
 {
   // Initialise weights & biases
   // inp layer + hidden layers + out layer
 
   //TODO validate number of layers cout >=3 or 2?
 
-  for (size_t i = 1; i < m_layers.size(); i++)
+  for (size_t i = 1; i < m_layers.size(); ++i)
   {
 
     m_weights.push_back(Matrix<T>(m_layers[i - 1], m_layers[i]).randomise().set_name("w_" + std::to_string(i)));
@@ -39,7 +39,7 @@ Matrix<T> NeuralNetwork<T>::feedforward(const Matrix<T> &t_inputs)
   out.set_name("inp");
   m_outs.push_back(out);
 
-  for (size_t i = 0; i < m_layers.size() - 1; i++)
+  for (size_t i = 0; i < m_layers.size() - 1; ++i)
   {
     Matrix<T> net = (out * m_weights[i]) + m_biases[i];
     out = NeuralNetwork::apply_activation(net, NeuralNetwork::Sigmoid);
@@ -76,7 +76,7 @@ void NeuralNetwork<T>::backpropagation(const Matrix<T> &t_inputs, const Matrix<T
   b_e.insert(b_e.begin(), node_delta.hadamard(lr));
 
   // loop to compute node deltas and weight error responsibilities from input to last hidden layer (I->H_[N-1])
-  for (size_t i = m_layers.size() - 2; i > 0; i--)
+  for (size_t i = m_layers.size() - 2; i > 0; --i)
   {
     node_delta = (node_delta * m_weights[i].transpose()).hadamard(delta_activ(m_outs[i]));
     w_e.insert(w_e.begin(), (m_outs[i - 1].transpose() * node_delta).hadamard(lr));
@@ -85,7 +85,7 @@ void NeuralNetwork<T>::backpropagation(const Matrix<T> &t_inputs, const Matrix<T
 
   // update weights
   // Sum and reset names
-  for (size_t i = 0; i < m_weights.size(); i++)
+  for (size_t i = 0; i < m_weights.size(); ++i)
   {
     // std::cout << "m_weights[i] = " << m_weights[i].get_rows() << "x" << m_weights[i].get_cols() << std::endl;
     // std::cout << "w_e[i] = " << w_e[i].get_rows() << "x" << w_e[i].get_cols() << std::endl;
@@ -99,7 +99,7 @@ void NeuralNetwork<T>::print(int t_precision, std::ostream *t_op)
 {
   *t_op << "\n~~~~~~~~~~ # Neural Network # ~~~~~~~~~~";
 
-  for (size_t i = 0; i < m_weights.size(); i++)
+  for (size_t i = 0; i < m_weights.size(); ++i)
   {
     *t_op << "\n";
     m_weights[i].print(t_precision, t_op);

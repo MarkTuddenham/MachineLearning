@@ -33,9 +33,9 @@ Matrix<T> Matrix<T>::multiply(const Matrix<T> &t_m) const
   {
     Matrix<T> res(m_rows, t_m.m_cols);
     Matrix<T> mt = t_m.transpose();
-    for (unsigned int i = 0; i < res.m_rows; i++)
+    for (unsigned int i = 0; i < res.m_rows; ++i)
     {
-      for (unsigned int j = 0; j < res.m_cols; j++)
+      for (unsigned int j = 0; j < res.m_cols; ++j)
       {
         //this->row[i] * m.column[j]
         res.m_data[i][j] = std::inner_product(m_data[i].data(), m_data[i].data() + m_data[i].size(), mt.m_data[j].data(), 0.0);
@@ -55,9 +55,9 @@ template <typename T>
 Matrix<T> Matrix<T>::transpose(void) const
 {
   Matrix<T> t(m_cols, m_rows);
-  for (unsigned int i = 0; i < t.m_rows; i++)
+  for (unsigned int i = 0; i < t.m_rows; ++i)
   {
-    for (unsigned int j = 0; j < t.m_cols; j++)
+    for (unsigned int j = 0; j < t.m_cols; ++j)
     {
       t.m_data[i][j] = m_data[j][i];
     }
@@ -132,9 +132,9 @@ Matrix<T> Matrix<T>::elementwise(const Matrix<T> &t_m, std::function<T(T, T)> t_
     unsigned int cols = amIScalar ? t_m.get_cols() : get_cols();
 
     Matrix<T> res(rows, cols);
-    for (unsigned int i = 0; i < res.m_rows; i++)
+    for (unsigned int i = 0; i < res.m_rows; ++i)
     {
-      for (unsigned int j = 0; j < res.m_cols; j++)
+      for (unsigned int j = 0; j < res.m_cols; ++j)
       {
         res.m_data[i][j] = t_f(
             n,
@@ -155,9 +155,9 @@ Matrix<T> Matrix<T>::elementwise(const Matrix<T> &t_m, std::function<T(T, T)> t_
   else
   {
     Matrix res(m_rows, m_cols);
-    for (unsigned int i = 0; i < res.get_rows(); i++)
+    for (unsigned int i = 0; i < res.get_rows(); ++i)
     {
-      for (unsigned int j = 0; j < res.get_cols(); j++)
+      for (unsigned int j = 0; j < res.get_cols(); ++j)
       {
         res.m_data[i][j] = t_f(m_data[i][j], t_m.m_data[i][j]);
       }
@@ -170,9 +170,9 @@ template <typename T>
 Matrix<T> Matrix<T>::apply(std::function<T(T)> t_f) const
 {
   Matrix<T> res(m_rows, m_cols);
-  for (unsigned int i = 0; i < res.get_rows(); i++)
+  for (unsigned int i = 0; i < res.get_rows(); ++i)
   {
-    for (unsigned int j = 0; j < res.get_cols(); j++)
+    for (unsigned int j = 0; j < res.get_cols(); ++j)
     {
       res.m_data[i][j] = t_f(m_data[i][j]);
     }
@@ -185,7 +185,7 @@ Matrix<T> Matrix<T>::from_array(const std::vector<T> &t_arr)
 {
   Matrix<T> res(1, t_arr.size());
 
-  for (unsigned int i = 0; i < res.m_cols; i++)
+  for (unsigned int i = 0; i < res.m_cols; ++i)
   {
     res.m_data[0][i] = t_arr[i];
   }

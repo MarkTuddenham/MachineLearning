@@ -15,4 +15,6 @@ install:
 
 compiler: gcc
 
-script: make test && test/run-tests
+script: 
+  - make test
+  - test/run-tests
