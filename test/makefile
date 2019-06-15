@@ -1,5 +1,5 @@
 # ~~~~~ COMMANDS ~~~~~
-CC := g++
+CXX := g++
 CCFLAGS := -O2 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor
 LINKFLAGS := 
 
@@ -29,13 +29,13 @@ build:  $(TARGET) $(BUILD_PATH)/
 
 # Build .o first
 $(BUILD_PATH)/%.o: $(SRC_PATH)/%.cpp
-	@echo [CC] $<
-	@$(CC) $(CCFLAGS) -o $@ -c $< -I $(INCLUDE_PATH) -I ../$(LIB_SRC_PATH)
+	@echo [CXX] $<
+	@$(CXX) $(CCFLAGS) -o $@ -c $< -I $(INCLUDE_PATH) -I ../$(LIB_SRC_PATH)
 
 # Build final binary
 $(TARGET): $(OBJ)
 	@echo [INFO] Creating Binary: $(TARGET)
-	@$(CC) -o $@ $^ $(LINKFLAGS) -I ../$(LIB_BUILD_PATH)/*
+	@$(CXX) -o $@ $^ $(LINKFLAGS) -I ../$(LIB_BUILD_PATH)/*
 
 
 # ~~~~~ other ~~~~~

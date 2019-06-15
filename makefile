@@ -1,5 +1,5 @@
 # ~~~~~ COMMANDS ~~~~~
-CC := g++
+CXX := g++
 CCFLAGS := -O3 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor
 LINKFLAGS := 
 
@@ -35,23 +35,27 @@ build-lib: $(OBJ) $(BUILD_PATH)/
 
 # Build .o first
 $(BUILD_PATH)/%.o: $(SRC_PATH)/%.cpp
-	@echo [CC] $<
-	@$(CC) $(CCFLAGS) -o $@ -c $< -I ./$(INCLUDE_PATH)
+	@echo [CXX] $<
+	@$(CXX) $(CCFLAGS) -o $@ -c $< -I ./$(INCLUDE_PATH)
 
 # # precompute headers
 # %.hpp.gch: %.hpp
-# 	@echo [CC] $<
-# 	@$(CC) $(CCFLAGS) -x c++-header -o $@ -c $< 
+# 	@echo [CXX] $<
+# 	@$(CXX) $(CCFLAGS) -x c++-header -o $@ -c $< 
 
 # Build final binary
 $(TARGET): $(OBJ)
 	@echo [INFO] Creating Binary: $(TARGET)
-	@$(CC) -o $@ $^ $(LINKFLAGS)
+	@$(CXX) -o $@ $^ $(LINKFLAGS)
 
 
 # ~~~~~ other ~~~~~
 test: build-lib
 	@$(MAKE) -C test
+
+check:
+	@echo [CHECK] Checking using cppcheck
+	@cppcheck --enable=all --inconclusive --template=gcc $(SRC_PATH)/ test/src/
 
 clean-all: clean
 	@$(MAKE) clean -C test 
