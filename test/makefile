@@ -1,7 +1,7 @@
 # ~~~~~ COMMANDS ~~~~~
 CXX := g++
 CCFLAGS := -O2 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor
-LINKFLAGS := 
+LINKFLAGS := -lgcov --coverage
 
 RM := rm
 
@@ -37,7 +37,7 @@ $(BUILD_PATH)/%.o: $(SRC_PATH)/%.cpp
 $(TARGET): $(OBJ)
 	@echo [INFO] Creating Binary: $(TARGET)
 	@mkdir -p $(@D)
-	@$(CXX) -o $@ $^ $(LINKFLAGS) -I ../$(LIB_BUILD_PATH)/*
+	@$(CXX) -o $@ $^ $(LINKFLAGS) -I ../$(LIB_BUILD_PATH)/*.o
 
 
 # ~~~~~ other ~~~~~
@@ -47,3 +47,4 @@ clean:
 	@$(RM) -rfv $(TMP_PATH)/*
 	@$(RM) -rfv $(TARGET)
 	@$(RM) -rfv $(INCLUDE_PATH)/*.gch
+

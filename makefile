@@ -1,7 +1,7 @@
 # ~~~~~ COMMANDS ~~~~~
 CXX := g++
-CCFLAGS := -O3 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor
-LINKFLAGS := 
+CCFLAGS := -O3 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fprofile-arcs -ftest-coverage
+LINKFLAGS :=  -lgcov --coverage
 
 RM := rm
 
@@ -11,6 +11,8 @@ TMP_PATH := tmp
 SRC_PATH := src
 BUILD_PATH := build
 INCLUDE_PATH := include
+
+TEST_PATH := test
 
 TARGET := ml
 # MAIN := main.cpp
@@ -53,14 +55,14 @@ $(TARGET): $(OBJ)
 
 # ~~~~~ other ~~~~~
 test: build-lib
-	@$(MAKE) -C test
+	@$(MAKE) -C $(TEST_PATH) 
 
 check:
 	@echo [CHECK] Checking using cppcheck
-	@cppcheck --enable=all --inconclusive --template=gcc $(SRC_PATH)/ test/src/
+	@cppcheck --enable=all --inconclusive --template=gcc $(SRC_PATH)/ $(TEST_PATH)/src/
 
 clean-all: clean
-	@$(MAKE) clean -C test 
+	@$(MAKE) clean -C $(TEST_PATH) 
 
 clean:
 	@echo "[Cleaning]"
@@ -68,3 +70,4 @@ clean:
 	@$(RM) -rfv $(TMP_PATH)/*
 	@$(RM) -rfv $(TARGET)
 	@$(RM) -rfv $(INCLUDE_PATH)/*.gch
+	@$(RM) -rfv *.gcov
