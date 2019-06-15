@@ -25,16 +25,18 @@ OBJ = $(patsubst $(SRC_PATH)/%,$(BUILD_PATH)/%,$(SRC:.cpp=.o))
 .DEFAULT_GOAL := build
 
 # ~~~~~ main ~~~~~
-build:  $(TARGET) $(BUILD_PATH)/
+build: $(TARGET) 
 
 # Build .o first
 $(BUILD_PATH)/%.o: $(SRC_PATH)/%.cpp
 	@echo [CXX] $<
+	@mkdir -p $(@D)
 	@$(CXX) $(CCFLAGS) -o $@ -c $< -I $(INCLUDE_PATH) -I ../$(LIB_SRC_PATH)
 
 # Build final binary
 $(TARGET): $(OBJ)
 	@echo [INFO] Creating Binary: $(TARGET)
+	@mkdir -p $(@D)
 	@$(CXX) -o $@ $^ $(LINKFLAGS) -I ../$(LIB_BUILD_PATH)/*
 
 
@@ -45,6 +47,3 @@ clean:
 	@$(RM) -rfv $(TMP_PATH)/*
 	@$(RM) -rfv $(TARGET)
 	@$(RM) -rfv $(INCLUDE_PATH)/*.gch
-
-$(BUILD_PATH):
-	@if [ ! -d $(BUILD_PATH)/ ]; then mkdir $(BUILD_PATH)/; fi

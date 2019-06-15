@@ -30,12 +30,13 @@ run: build
 	@./$(TARGET)
 
 # ~~~~~ main ~~~~~
-build:  $(TARGET) $(BUILD_PATH)/
-build-lib: $(OBJ) $(BUILD_PATH)/
+build: $(TARGET) 
+build-lib:  $(OBJ) 
 
 # Build .o first
 $(BUILD_PATH)/%.o: $(SRC_PATH)/%.cpp
 	@echo [CXX] $<
+	@mkdir -p $(@D)
 	@$(CXX) $(CCFLAGS) -o $@ -c $< -I ./$(INCLUDE_PATH)
 
 # # precompute headers
@@ -46,6 +47,7 @@ $(BUILD_PATH)/%.o: $(SRC_PATH)/%.cpp
 # Build final binary
 $(TARGET): $(OBJ)
 	@echo [INFO] Creating Binary: $(TARGET)
+	@mkdir -p $(@D)
 	@$(CXX) -o $@ $^ $(LINKFLAGS)
 
 
@@ -66,7 +68,3 @@ clean:
 	@$(RM) -rfv $(TMP_PATH)/*
 	@$(RM) -rfv $(TARGET)
 	@$(RM) -rfv $(INCLUDE_PATH)/*.gch
-
-
-$(BUILD_PATH):
-	@if [ ! -d $(BUILD_PATH)/ ]; then mkdir $(BUILD_PATH)/; fi
