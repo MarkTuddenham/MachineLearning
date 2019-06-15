@@ -11,7 +11,8 @@ private:
   std::vector<Matrix<T>> m_weights, m_biases, m_outs;
 
 public:
-  NeuralNetwork(std::vector<int> t_layers);
+  NeuralNetwork() = delete;
+  explicit NeuralNetwork(const std::vector<int> &t_layers);
 
   const std::vector<int> &get_layers() const;
 

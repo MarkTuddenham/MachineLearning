@@ -17,6 +17,7 @@ private:
   Matrix<T> elementwise(const Matrix<T> &t_m, std::function<T(T, T)> t_f) const;
 
 public:
+  Matrix() = delete;
   Matrix(unsigned int t_rows, unsigned int t_cols, T t_fill = 0, std::string t_name = "M");
 
   Matrix<T> set_name(std::string t_name);
