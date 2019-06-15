@@ -95,30 +95,26 @@ void NeuralNetwork<T>::backpropagation(const Matrix<T> &t_inputs, const Matrix<T
 }
 
 template <typename T>
-void NeuralNetwork<T>::print(int precision, std::ostream *op)
+void NeuralNetwork<T>::print(int t_precision, std::ostream *t_op)
 {
-  *op << std::endl
-      << "~~~~~~~~~~ # Neural Network # ~~~~~~~~~~"
-      << std::endl;
+  *t_op << "\n~~~~~~~~~~ # Neural Network # ~~~~~~~~~~";
 
   for (size_t i = 0; i < m_weights.size(); i++)
   {
-    m_weights[i].print(precision, op);
-    *op << std::endl;
-    m_biases[i].print(precision, op);
-    *op << std::endl;
+    *t_op << "\n";
+    m_weights[i].print(t_precision, t_op);
+    *t_op << "\n";
+    m_biases[i].print(t_precision, t_op);
   }
-  *op << "~~~~~~~~~~ # ~~~~~~~~~~~~~~ # ~~~~~~~~~~"
-      << std::endl
-      << std::endl;
+  *t_op << "~~~~~~~~~~ # ~~~~~~~~~~~~~~ # ~~~~~~~~~~\n\n";
 }
 
 template <typename T>
-Matrix<T> NeuralNetwork<T>::apply_activation(const Matrix<T> &m, Activation af)
+Matrix<T> NeuralNetwork<T>::apply_activation(const Matrix<T> &t_m, Activation t_a)
 {
   std::function<double(double)> f;
 
-  switch (af)
+  switch (t_a)
   {
   case Sigmoid:
     f = [](T d) {
@@ -140,7 +136,7 @@ Matrix<T> NeuralNetwork<T>::apply_activation(const Matrix<T> &m, Activation af)
     break;
   }
 
-  return m.apply(f);
+  return t_m.apply(f);
 }
 
 template class NeuralNetwork<float>;

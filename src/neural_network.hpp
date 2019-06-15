@@ -11,13 +11,13 @@ private:
   std::vector<Matrix<T>> m_weights, m_biases, m_outs;
 
 public:
-  NeuralNetwork(std::vector<int>);
+  NeuralNetwork(std::vector<int> t_layers);
 
   const std::vector<int> &get_layers() const;
 
-  Matrix<T> feedforward(const Matrix<T> &);
-  void backpropagation(const Matrix<T> &, const Matrix<T> &, T eta);
-  void print(int precision = 3, std::ostream *op = &std::cout);
+  Matrix<T> feedforward(const Matrix<T> &t_inputs);
+  void backpropagation(const Matrix<T> &t_inputs, const Matrix<T> &t_targets, T t_eta);
+  void print(int t_precision = 3, std::ostream *t_op = &std::cout);
 
   enum Activation
   {
@@ -25,5 +25,5 @@ public:
     FastSigmoid,
     Tanh
   };
-  static Matrix<T> apply_activation(const Matrix<T> &, Activation);
+  static Matrix<T> apply_activation(const Matrix<T> &t_m, Activation t_a);
 };

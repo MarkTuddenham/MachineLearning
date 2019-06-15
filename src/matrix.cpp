@@ -46,9 +46,9 @@ Matrix<T> Matrix<T>::multiply(const Matrix<T> &t_m) const
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::operator*(const Matrix<T> &m) const
+Matrix<T> Matrix<T>::operator*(const Matrix<T> &t_m) const
 {
-  return this->multiply(m);
+  return this->multiply(t_m);
 }
 
 template <typename T>
@@ -66,33 +66,33 @@ Matrix<T> Matrix<T>::transpose(void) const
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::add(const Matrix<T> &m) const
+Matrix<T> Matrix<T>::add(const Matrix<T> &t_m) const
 {
-  return this->elementwise(m, [](T a, T b) { return a + b; });
+  return this->elementwise(t_m, [](T a, T b) { return a + b; });
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::operator+(const Matrix<T> &m) const
+Matrix<T> Matrix<T>::operator+(const Matrix<T> &t_m) const
 {
-  return this->add(m);
+  return this->add(t_m);
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::subtract(const Matrix<T> &m) const
+Matrix<T> Matrix<T>::subtract(const Matrix<T> &t_m) const
 {
-  return this->elementwise(m, [](T a, T b) { return a - b; });
+  return this->elementwise(t_m, [](T a, T b) { return a - b; });
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::operator-(const Matrix<T> &m) const
+Matrix<T> Matrix<T>::operator-(const Matrix<T> &t_m) const
 {
-  return this->subtract(m);
+  return this->subtract(t_m);
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::hadamard(const Matrix<T> &m) const
+Matrix<T> Matrix<T>::hadamard(const Matrix<T> &t_m) const
 {
-  return this->elementwise(m, [](T a, T b) { return a * b; });
+  return this->elementwise(t_m, [](T a, T b) { return a * b; });
 }
 
 template <typename T>
@@ -116,91 +116,92 @@ Matrix<T> Matrix<T>::randomise(void)
 
 //~~~~~~~~~~~~~~~~~HELPERS~~~~~~~~~~~~~~~~~~~~~~~~~
 template <typename T>
-Matrix<T> Matrix<T>::elementwise(const Matrix<T> &m, std::function<T(T, T)> f) const
+Matrix<T> Matrix<T>::elementwise(const Matrix<T> &t_m, std::function<T(T, T)> t_f) const
 {
   // Deal with scalar multiplication
-  bool amIScalar = this->get_rows() == 1 && this->get_cols() == 1;
-  bool isOtherScalar = m.get_rows() == 1 && m.get_cols() == 1;
+  bool amIScalar = get_rows() == 1 && get_cols() == 1;
+  bool isOtherScalar = t_m.get_rows() == 1 && t_m.get_cols() == 1;
 
   if (amIScalar || isOtherScalar)
   {
 
     // if other is scalar then swap
 
-    T n = amIScalar ? this->flatten()[0] : m.flatten()[0];
-    unsigned int rows = amIScalar ? m.get_rows() : this->get_rows();
-    unsigned int cols = amIScalar ? m.get_cols() : this->get_cols();
+    T n = amIScalar ? flatten()[0] : t_m.flatten()[0];
+    unsigned int rows = amIScalar ? t_m.get_rows() : get_rows();
+    unsigned int cols = amIScalar ? t_m.get_cols() : get_cols();
 
-    Matrix<T> t(rows, cols);
-    for (unsigned int i = 0; i < t.m_rows; i++)
+    Matrix<T> res(rows, cols);
+    for (unsigned int i = 0; i < res.m_rows; i++)
     {
-      for (unsigned int j = 0; j < t.m_cols; j++)
+      for (unsigned int j = 0; j < res.m_cols; j++)
       {
-        t.m_data[i][j] = f(
+        res.m_data[i][j] = t_f(
             n,
-            (amIScalar ? m.m_data : m_data)[i][j]);
+            (amIScalar ? t_m.m_data : m_data)[i][j]);
       }
     }
-    return t;
+    return res;
   }
 
   // n-D elementwise
 
-  if (m_rows != m.m_rows || m_cols != m.m_cols)
+  if (m_rows != t_m.m_rows || m_cols != t_m.m_cols)
   {
     throw std::invalid_argument("Matrices are not the same size! " +
                                 std::to_string(m_rows) + "x" + std::to_string(m_cols) + " and " +
-                                std::to_string(m.m_rows) + "x" + std::to_string(m.m_cols));
+                                std::to_string(t_m.m_rows) + "x" + std::to_string(t_m.m_cols));
   }
   else
   {
-    Matrix t(m_rows, m_cols);
-    for (unsigned int i = 0; i < t.m_rows; i++)
+    Matrix res(m_rows, m_cols);
+    for (unsigned int i = 0; i < res.get_rows(); i++)
     {
-      for (unsigned int j = 0; j < t.m_cols; j++)
+      for (unsigned int j = 0; j < res.get_cols(); j++)
       {
-        t.m_data[i][j] = f(m_data[i][j], m.m_data[i][j]);
+        res.m_data[i][j] = t_f(m_data[i][j], t_m.m_data[i][j]);
       }
     }
-    return t;
+    return res;
   }
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::apply(std::function<T(T)> f) const
+Matrix<T> Matrix<T>::apply(std::function<T(T)> t_f) const
 {
-  Matrix<T> m(m_rows, m_cols);
-  for (unsigned int i = 0; i < m.m_rows; i++)
+  Matrix<T> res(m_rows, m_cols);
+  for (unsigned int i = 0; i < res.get_rows(); i++)
   {
-    for (unsigned int j = 0; j < m.m_cols; j++)
+    for (unsigned int j = 0; j < res.get_cols(); j++)
     {
-      m.m_data[i][j] = f(m_data[i][j]);
+      res.m_data[i][j] = t_f(m_data[i][j]);
     }
   }
-  return m;
+  return res;
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::from_array(const std::vector<T> &arr)
+Matrix<T> Matrix<T>::from_array(const std::vector<T> &t_arr)
 {
-  Matrix<T> m(1, arr.size());
-  for (unsigned int i = 0; i < m.m_cols; i++)
+  Matrix<T> res(1, t_arr.size());
+
+  for (unsigned int i = 0; i < res.m_cols; i++)
   {
-    m.m_data[0][i] = arr[i];
+    res.m_data[0][i] = t_arr[i];
   }
-  return m;
+  return res;
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::ones(unsigned int rows, unsigned int cols)
+Matrix<T> Matrix<T>::ones(unsigned int t_rows, unsigned int t_cols)
 {
-  return Matrix<T>(rows, cols, 1);
+  return Matrix<T>(t_rows, t_cols, 1);
 }
 
 template <typename T>
-Matrix<T> Matrix<T>::zeros(unsigned int rows, unsigned int cols)
+Matrix<T> Matrix<T>::zeros(unsigned int t_rows, unsigned int t_cols)
 {
-  return Matrix<T>(rows, cols, 0);
+  return Matrix<T>(t_rows, t_cols, 0);
 }
 
 template <typename T>
@@ -218,24 +219,27 @@ std::vector<T> Matrix<T>::flatten(void) const
 }
 
 template <typename T>
-void Matrix<T>::print(int precision, std::ostream *op) const
+void Matrix<T>::print(int t_precision, std::ostream *t_op) const
 {
   if (m_name != "")
-    *op << m_name << ": ";
+    *t_op << m_name << ": ";
 
-  *op << m_rows << 'x' << m_cols << " Matrix:" << '\n';
-  *op << std::setprecision(precision) << std::fixed;
+  *t_op << m_rows << 'x' << m_cols << " Matrix:\n";
+  *t_op << std::setprecision(t_precision) << std::fixed;
 
   for (auto const &r : m_data)
   {
     for (auto const &v : r)
     {
-      *op << " | ";
+      *t_op << " | ";
+
+      // add extra space to account for minus sign
       if (v > 0)
-        *op << " ";
-      *op << v;
+        *t_op << " ";
+
+      *t_op << v;
     }
-    *op << " |\n";
+    *t_op << " |\n";
   }
 }
 
