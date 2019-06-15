@@ -1,6 +1,6 @@
 # ~~~~~ COMMANDS ~~~~~
 CC := g++
-CCFLAGS := -O2 -pthread -Wall -Wextra -Wpedantic
+CCFLAGS := -O2 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor
 LINKFLAGS := 
 
 RM := rm
