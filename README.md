@@ -10,3 +10,7 @@
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/marktuddenham/teslyn.svg)
 
 A from-scratch implementation of Neural Networks.
+
+
+---
+Copyright &copy; Mark Tuddenham
