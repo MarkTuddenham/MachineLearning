@@ -20,7 +20,7 @@ compiler: gcc
 
 script: 
   - make test
-  - test/run-tests
+  - ./run-tests
 
 after_success:
-  - coveralls -b . --exclude include --exclude test --gcov-options '\-lp'
+  - coveralls -b . --exclude lib/include --exclude test --gcov-options '\-lp'

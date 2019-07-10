@@ -1,7 +1,5 @@
 #pragma once
 
-// class Matrix;
-
 #include <vector>
 #include <iostream>
 #include <functional>
