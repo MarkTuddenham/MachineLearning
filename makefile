@@ -71,7 +71,6 @@ TEST_OBJ = $(patsubst $(TEST_PATH)/$(SRC_PATH)/%,$(TEST_PATH)/$(BUILD_PATH)/%,$(
 test: build-test $(TEST_TARGET)
 
 build-test: $(TEST_SO)
-	# @mv $< $(TEST_PATH)
 
 $(TEST_SO): $(TEST_LIB_OBJ)
 	@echo "[INFO] Building $@"
@@ -89,7 +88,7 @@ $(TEST_PATH)/$(BUILD_PATH)/%.o: $(TEST_PATH)/$(SRC_PATH)/%.cpp
 
 $(TEST_TARGET): $(TEST_OBJ)
 	@echo [INFO] Creating Binary: $@
-	$(CXX)  $^ -o $@ $(TEST_LINKFLAGS) -L. -I $(LIB_PATH)/$(SRC_PATH) -lteslyn_test
+	@$(CXX)  $^ -o $@ $(TEST_LINKFLAGS) -L. -I $(LIB_PATH)/$(SRC_PATH) -lteslyn_test
 
 
 # check:
@@ -108,6 +107,8 @@ $(EX_PATH)/%: $(EX_PATH)/%.cpp
 
 # ~~~~~ clean ~~~~~
 clean-all: clean-lib clean-test
+	@echo "[INFO] Cleaning .so files"
+	@$(RM) -rfv *.so
 	@echo "[INFO] Cleaning $(EX_PATH)/"
 	@$(RM) -rfv $(EX_RUNNABLES)
 
