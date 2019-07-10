@@ -1,7 +1,9 @@
 # ~~~~~ COMMANDS ~~~~~
 CXX := g++
-CCFLAGS := -O3 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fprofile-arcs -ftest-coverage
-LINKFLAGS :=  -lgcov --coverage
+CCFLAGS :=  -O3 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor
+CCFLAGS_TEST := -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fprofile-arcs -ftest-coverage -fsanitize=address
+LINKFLAGS :=
+LINKFLAGS_TEST := -lgcov --coverage
 
 RM := rm
 
@@ -25,7 +27,7 @@ OBJ = $(patsubst $(SRC_PATH)/%,$(BUILD_PATH)/%,$(SRC:.cpp=.o))
 
 # ~~~~~ BUILD RULES ~~~~~
 .PHONY: build build-lib clean clean-all run test
-.DEFAULT_GOAL := build
+.DEFAULT_GOAL := build-lib
 
 run: build
 	@echo [RUNNING] $(TARGET)
@@ -70,4 +72,3 @@ clean:
 	@$(RM) -rfv $(TMP_PATH)/*
 	@$(RM) -rfv $(TARGET)
 	@$(RM) -rfv $(INCLUDE_PATH)/*.gch
-	@$(RM) -rfv *.gcov

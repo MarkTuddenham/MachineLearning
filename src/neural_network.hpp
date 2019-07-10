@@ -3,12 +3,14 @@
 #include "matrix.hpp"
 #include <vector>
 
-template <typename T = double>
+namespace Teslyn
+{
+
 class NeuralNetwork
 {
 private:
   const std::vector<int> m_layers;
-  std::vector<Matrix<T>> m_weights, m_biases, m_outs;
+  std::vector<Matrix> m_weights, m_biases, m_outs;
 
 public:
   NeuralNetwork() = delete;
@@ -16,8 +18,8 @@ public:
 
   const std::vector<int> &get_layers() const;
 
-  Matrix<T> feedforward(const Matrix<T> &t_inputs);
-  void backpropagation(const Matrix<T> &t_inputs, const Matrix<T> &t_targets, T t_eta);
+  Matrix feedforward(const Matrix &t_inputs);
+  void backpropagation(const Matrix &t_inputs, const Matrix &t_targets, double t_eta);
   void print(int t_precision = 3, std::ostream *t_op = &std::cout);
 
   enum Activation
@@ -26,5 +28,7 @@ public:
     FastSigmoid,
     Tanh
   };
-  static Matrix<T> apply_activation(const Matrix<T> &t_m, Activation t_a);
+  static Matrix apply_activation(const Matrix &t_m, Activation t_a);
 };
+
+} // namespace Teslyn

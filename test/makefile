@@ -1,6 +1,6 @@
 # ~~~~~ COMMANDS ~~~~~
 CXX := g++
-CCFLAGS := -O2 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor
+CCFLAGS := -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fprofile-arcs -ftest-coverage #-fsanitize=address
 LINKFLAGS := -lgcov --coverage
 
 RM := rm
@@ -37,7 +37,7 @@ $(BUILD_PATH)/%.o: $(SRC_PATH)/%.cpp
 $(TARGET): $(OBJ)
 	@echo [INFO] Creating Binary: $(TARGET)
 	@mkdir -p $(@D)
-	@$(CXX) -o $@ $^ $(LINKFLAGS) -I ../$(LIB_BUILD_PATH)/*.o
+	@$(CXX) -o $@ $^ $(LINKFLAGS) ../$(LIB_BUILD_PATH)/* -I ../$(LIB_SRC_PATH)/
 
 
 # ~~~~~ other ~~~~~

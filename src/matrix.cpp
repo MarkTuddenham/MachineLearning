@@ -5,22 +5,23 @@
 #include <random>
 #include <iomanip>
 
-template <typename T>
-Matrix<T>::Matrix(unsigned int t_rows, unsigned int t_cols, T t_fill, std::string t_name) : m_rows(t_rows), m_cols(t_cols), m_name(t_name)
+namespace Teslyn
 {
-  this->m_data = std::vector<std::vector<T>>(m_rows, std::vector<T>(m_cols, t_fill));
+
+Matrix::Matrix(unsigned int t_rows, unsigned int t_cols, double t_fill, std::string t_name) : m_rows(t_rows), m_cols(t_cols), m_name(t_name)
+{
+  this->m_data = std::vector<std::vector<double>>(m_rows, std::vector<double>(m_cols, t_fill));
 }
 
-template <typename T>
-bool Matrix<T>::operator==(const Matrix<T> &t_m) const
+bool Matrix::operator==(const Matrix &t_m) const
 {
-  return m_data == t_m.m_data;
+  return m_data == t_m.m_data; //TODO and the shape is the same
 }
 
 //~~~~~~~~~~~~~~~~~MATHS~~~~~~~~~~~~~~~~~~~~~~~~~
 // [this][m]
-template <typename T>
-Matrix<T> Matrix<T>::multiply(const Matrix<T> &t_m) const
+
+Matrix Matrix::multiply(const Matrix &t_m) const
 {
   //check dimensions
   if (m_cols != t_m.m_rows)
@@ -31,8 +32,8 @@ Matrix<T> Matrix<T>::multiply(const Matrix<T> &t_m) const
   }
   else
   {
-    Matrix<T> res(m_rows, t_m.m_cols);
-    Matrix<T> mt = t_m.transpose();
+    Matrix res(m_rows, t_m.m_cols);
+    Matrix mt = t_m.transpose();
     for (unsigned int i = 0; i < res.m_rows; ++i)
     {
       for (unsigned int j = 0; j < res.m_cols; ++j)
@@ -45,16 +46,14 @@ Matrix<T> Matrix<T>::multiply(const Matrix<T> &t_m) const
   }
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::operator*(const Matrix<T> &t_m) const
+Matrix Matrix::operator*(const Matrix &t_m) const
 {
   return this->multiply(t_m);
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::transpose(void) const
+Matrix Matrix::transpose(void) const
 {
-  Matrix<T> t(m_cols, m_rows);
+  Matrix t(m_cols, m_rows);
   for (unsigned int i = 0; i < t.m_rows; ++i)
   {
     for (unsigned int j = 0; j < t.m_cols; ++j)
@@ -65,49 +64,44 @@ Matrix<T> Matrix<T>::transpose(void) const
   return t;
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::add(const Matrix<T> &t_m) const
+Matrix Matrix::add(const Matrix &t_m) const
 {
-  return this->elementwise(t_m, [](T a, T b) { return a + b; });
+  return this->elementwise(t_m, [](double a, double b) { return a + b; });
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::operator+(const Matrix<T> &t_m) const
+Matrix Matrix::operator+(const Matrix &t_m) const
 {
   return this->add(t_m);
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::subtract(const Matrix<T> &t_m) const
+Matrix Matrix::subtract(const Matrix &t_m) const
 {
-  return this->elementwise(t_m, [](T a, T b) { return a - b; });
+  return this->elementwise(t_m, [](double a, double b) { return a - b; });
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::operator-(const Matrix<T> &t_m) const
+Matrix Matrix::operator-(const Matrix &t_m) const
 {
   return this->subtract(t_m);
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::hadamard(const Matrix<T> &t_m) const
+Matrix Matrix::hadamard(const Matrix &t_m) const
 {
-  return this->elementwise(t_m, [](T a, T b) { return a * b; });
+  return this->elementwise(t_m, [](double a, double b) { return a * b; });
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::randomise(void)
+Matrix Matrix::randomise(void)
 {
-  static T lower_bound = -1;
-  static T upper_bound = 1;
-  static std::uniform_real_distribution<T> gaussiand(lower_bound, upper_bound);
-  static std::default_random_engine re(1289674753);
+  static double lower_bound = -1;
+  static double upper_bound = 1;
+  static std::uniform_real_distribution<double> gaussian_dist(lower_bound, upper_bound);
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
 
   for (auto &r : m_data)
   {
-    for (T &v : r)
+    for (double &v : r)
     {
-      v = gaussiand(re);
+      v = gaussian_dist(gen);
     }
   }
 
@@ -115,8 +109,8 @@ Matrix<T> Matrix<T>::randomise(void)
 }
 
 //~~~~~~~~~~~~~~~~~HELPERS~~~~~~~~~~~~~~~~~~~~~~~~~
-template <typename T>
-Matrix<T> Matrix<T>::elementwise(const Matrix<T> &t_m, std::function<T(T, T)> t_f) const
+
+Matrix Matrix::elementwise(const Matrix &t_m, std::function<double(double, double)> t_f) const
 {
   // Deal with scalar multiplication
   bool amIScalar = get_rows() == 1 && get_cols() == 1;
@@ -127,11 +121,11 @@ Matrix<T> Matrix<T>::elementwise(const Matrix<T> &t_m, std::function<T(T, T)> t_
 
     // if other is scalar then swap
 
-    T n = amIScalar ? flatten()[0] : t_m.flatten()[0];
+    double n = amIScalar ? flatten()[0] : t_m.flatten()[0];
     unsigned int rows = amIScalar ? t_m.get_rows() : get_rows();
     unsigned int cols = amIScalar ? t_m.get_cols() : get_cols();
 
-    Matrix<T> res(rows, cols);
+    Matrix res(rows, cols);
     for (unsigned int i = 0; i < res.m_rows; ++i)
     {
       for (unsigned int j = 0; j < res.m_cols; ++j)
@@ -166,10 +160,9 @@ Matrix<T> Matrix<T>::elementwise(const Matrix<T> &t_m, std::function<T(T, T)> t_
   }
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::apply(std::function<T(T)> t_f) const
+Matrix Matrix::apply(std::function<double(double)> t_f) const
 {
-  Matrix<T> res(m_rows, m_cols);
+  Matrix res(m_rows, m_cols);
   for (unsigned int i = 0; i < res.get_rows(); ++i)
   {
     for (unsigned int j = 0; j < res.get_cols(); ++j)
@@ -180,10 +173,9 @@ Matrix<T> Matrix<T>::apply(std::function<T(T)> t_f) const
   return res;
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::from_array(const std::vector<T> &t_arr)
+Matrix Matrix::from_array(const std::vector<double> &t_arr)
 {
-  Matrix<T> res(1, t_arr.size());
+  Matrix res(1, t_arr.size());
 
   for (unsigned int i = 0; i < res.m_cols; ++i)
   {
@@ -192,25 +184,22 @@ Matrix<T> Matrix<T>::from_array(const std::vector<T> &t_arr)
   return res;
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::ones(unsigned int t_rows, unsigned int t_cols)
+Matrix Matrix::ones(unsigned int t_rows, unsigned int t_cols)
 {
-  return Matrix<T>(t_rows, t_cols, 1);
+  return Matrix(t_rows, t_cols, 1);
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::zeros(unsigned int t_rows, unsigned int t_cols)
+Matrix Matrix::zeros(unsigned int t_rows, unsigned int t_cols)
 {
-  return Matrix<T>(t_rows, t_cols, 0);
+  return Matrix(t_rows, t_cols, 0);
 }
 
-template <typename T>
-std::vector<T> Matrix<T>::flatten(void) const
+std::vector<double> Matrix::flatten(void) const
 {
-  std::vector<T> flat;
+  std::vector<double> flat;
   for (auto const &r : m_data)
   {
-    for (T const &v : r)
+    for (double const &v : r)
     {
       flat.push_back(v);
     }
@@ -218,8 +207,7 @@ std::vector<T> Matrix<T>::flatten(void) const
   return flat;
 }
 
-template <typename T>
-void Matrix<T>::print(int t_precision, std::ostream *t_op) const
+void Matrix::print(int t_precision, std::ostream *t_op) const
 {
   if (m_name != "")
     *t_op << m_name << ": ";
@@ -243,24 +231,20 @@ void Matrix<T>::print(int t_precision, std::ostream *t_op) const
   }
 }
 
-template <typename T>
-unsigned int Matrix<T>::get_rows() const
+unsigned int Matrix::get_rows() const
 {
   return m_rows;
 }
 
-template <typename T>
-unsigned int Matrix<T>::get_cols() const
+unsigned int Matrix::get_cols() const
 {
   return m_cols;
 }
 
-template <typename T>
-Matrix<T> Matrix<T>::set_name(std::string t_name)
+Matrix Matrix::set_name(std::string t_name)
 {
   m_name = t_name;
   return *this;
 }
 
-template class Matrix<float>;
-template class Matrix<double>;
+} // namespace Teslyn

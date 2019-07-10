@@ -1,8 +1,10 @@
+#pragma once
 #include <matrix.hpp>
 
-template <typename T>
-std::ostream &operator<<(std::ostream &os, Matrix<T> const &value)
+using Teslyn::Matrix;
+
+std::ostream &operator<<(std::ostream &os, Matrix const &m)
 {
-    value.print(1, &os);
+    m.print(1, &os);
     return os;
 }
