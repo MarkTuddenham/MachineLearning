@@ -20,7 +20,7 @@ public:
   Matrix() = delete;
   Matrix(unsigned int t_rows, unsigned int t_cols, double t_fill = 0, std::string t_name = "M");
 
-  Matrix set_name(std::string t_name);
+  Matrix set_name(const std::string &t_name);
   std::string get_name() const;
 
   Matrix randomise(void);
@@ -43,7 +43,6 @@ public:
 
   Matrix apply(std::function<double(double)> t_f) const;
   std::vector<double> flatten(void) const;
-  void print(int t_precision = 3, std::ostream *t_op = &std::cout) const;
 
   static Matrix from_array(const std::vector<double> &t_arr);
   static Matrix ones(unsigned int t_rows, unsigned int t_cols);

@@ -207,30 +207,6 @@ std::vector<double> Matrix::flatten(void) const
   return flat;
 }
 
-void Matrix::print(int t_precision, std::ostream *t_op) const
-{
-  if (m_name != "")
-    *t_op << m_name << ": ";
-
-  *t_op << m_rows << 'x' << m_cols << " Matrix:\n";
-  *t_op << std::setprecision(t_precision) << std::fixed;
-
-  for (auto const &r : m_data)
-  {
-    for (auto const &v : r)
-    {
-      *t_op << " | ";
-
-      // add extra space to account for minus sign
-      if (v > 0)
-        *t_op << " ";
-
-      *t_op << v;
-    }
-    *t_op << " |\n";
-  }
-}
-
 unsigned int Matrix::get_rows() const
 {
   return m_rows;
@@ -241,7 +217,12 @@ unsigned int Matrix::get_cols() const
   return m_cols;
 }
 
-Matrix Matrix::set_name(std::string t_name)
+std::string Matrix::get_name() const
+{
+  return m_name;
+}
+
+Matrix Matrix::set_name(const std::string &t_name)
 {
   m_name = t_name;
   return *this;

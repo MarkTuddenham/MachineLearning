@@ -93,20 +93,6 @@ void NeuralNetwork::backpropagation(const Matrix &t_inputs, const Matrix &t_targ
   }
 }
 
-void NeuralNetwork::print(int t_precision, std::ostream *t_op)
-{
-  *t_op << "\n~~~~~~~~~~ # Neural Network # ~~~~~~~~~~";
-
-  for (size_t i = 0; i < m_weights.size(); ++i)
-  {
-    *t_op << "\n";
-    m_weights[i].print(t_precision, t_op);
-    *t_op << "\n";
-    m_biases[i].print(t_precision, t_op);
-  }
-  *t_op << "~~~~~~~~~~ # ~~~~~~~~~~~~~~ # ~~~~~~~~~~\n\n";
-}
-
 Matrix NeuralNetwork::apply_activation(const Matrix &t_m, Activation t_a)
 {
   std::function<double(double)> f;
