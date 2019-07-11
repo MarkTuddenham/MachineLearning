@@ -1,10 +1,9 @@
 #pragma once
-#include <matrix.hpp>
+#include "matrix.hpp"
+#include "utils/printer.hpp"
 
-using Teslyn::Matrix;
-
-std::ostream &operator<<(std::ostream &os, Matrix const &m)
+std::ostream &operator<<(std::ostream &os, Teslyn::Matrix const &m)
 {
-    m.print(1, &os);
+    Teslyn::display::print_matrix(m, 1, &os);
     return os;
 }

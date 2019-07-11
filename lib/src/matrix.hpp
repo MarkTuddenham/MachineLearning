@@ -11,9 +11,10 @@ class Matrix
 {
 private:
   unsigned int m_rows, m_cols;
-  std::vector<std::vector<double>> m_data; //TODO change to just one vector and use better indexing
+  std::vector<double> m_data; //TODO change to just one vector and use better indexing
   std::string m_name;
 
+  unsigned int get_size() const;
   Matrix elementwise(const Matrix &t_m, std::function<double(double, double)> t_f) const;
 
 public:
@@ -23,7 +24,7 @@ public:
   Matrix set_name(const std::string &t_name);
   std::string get_name() const;
 
-  Matrix randomise(void);
+  Matrix randomise();
   unsigned int get_rows() const;
   unsigned int get_cols() const;
 
@@ -42,7 +43,9 @@ public:
   Matrix transpose(void) const;
 
   Matrix apply(std::function<double(double)> t_f) const;
-  std::vector<double> flatten(void) const;
+  std::vector<double> get_flattened() const;
+
+  Matrix reshape(unsigned int t_rows, unsigned int t_cols);
 
   static Matrix from_array(const std::vector<double> &t_arr);
   static Matrix ones(unsigned int t_rows, unsigned int t_cols);

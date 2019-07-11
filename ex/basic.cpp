@@ -25,7 +25,7 @@ int main()
   print_nn(nn);
 
   auto f = [](const Matrix &m) {
-    auto flat = m.flatten();
+    auto flat = m.get_flattened();
     return (flat.front() == flat.back()) ? Matrix::from_array({0.0, 1.0}) : Matrix::from_array({1.0, 0.0});
   };
 

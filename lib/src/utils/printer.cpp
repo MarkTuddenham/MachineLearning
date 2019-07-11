@@ -1,7 +1,7 @@
 #include <iomanip>
 
-#include "matrix.hpp"
-#include "neural_network.hpp"
+#include "../matrix.hpp"
+#include "../neural_network.hpp"
 
 using Teslyn::Matrix;
 using Teslyn::NeuralNetwork;
@@ -17,7 +17,7 @@ void print_matrix(const Matrix &m, int t_precision, std::ostream *t_op)
     *t_op << m.get_rows() << 'x' << m.get_cols() << " Matrix:\n";
     *t_op << std::setprecision(t_precision) << std::fixed;
 
-    for (auto const &v : m.flatten())
+    for (auto const &v : m.get_flattened())
     {
         // TODO format properly for n dimensions
         // for (auto const &v : r)
