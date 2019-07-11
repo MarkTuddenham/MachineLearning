@@ -1,10 +1,10 @@
 # ~~~~~ COMMANDS ~~~~~
 CXX := $(CXX)
 
-LIB_CCFLAGS :=  -O3 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fPIC
+LIB_CCFLAGS := -std=c++17 -O3 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fPIC
 LIB_LINKFLAGS := 
 
-TEST_CCFLAGS := -O0 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fPIC -fprofile-arcs -ftest-coverage #-fsanitize=address
+TEST_CCFLAGS := -std=c++17 -O0 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fPIC -fprofile-arcs -ftest-coverage #-fsanitize=address
 TEST_LINKFLAGS :=  -fprofile-arcs --coverage
 
 RM := rm
@@ -46,7 +46,7 @@ $(LIB_SO): $(LIB_OBJ)
 $(LIB_PATH)/$(BUILD_PATH)/%.o: $(LIB_PATH)/$(SRC_PATH)/%.cpp
 	@echo [CXX] $<
 	@mkdir -p $(@D)
-	@$(CXX) $(LIB_CCFLAGS) -o $@ -c $< -I ./$(LIB_PATH)/$(INCLUDE_PATH)
+	@$(CXX) $(LIB_CCFLAGS) -o $@ -c $< -I $(LIB_PATH)/$(INCLUDE_PATH) -I $(LIB_PATH)/$(SRC_PATH)
 
 
 # INSTALL_DIR := /usr/local/lib 
@@ -84,16 +84,16 @@ $(TEST_PATH)/$(BUILD_PATH)/%_lib.o: $(LIB_PATH)/$(SRC_PATH)/%.cpp
 $(TEST_PATH)/$(BUILD_PATH)/%.o: $(TEST_PATH)/$(SRC_PATH)/%.cpp
 	@echo [CXX] $<
 	@mkdir -p $(@D)
-	@$(CXX) $(LIB_CCFLAGS) -o $@ -c $< -I ./$(TEST_PATH)/$(INCLUDE_PATH) -I $(LIB_PATH)/$(SRC_PATH)
+	@$(CXX) $(LIB_CCFLAGS) -o $@ -c $< -I $(TEST_PATH)/$(INCLUDE_PATH) -I $(LIB_PATH)/$(SRC_PATH)
 
 $(TEST_TARGET): $(TEST_OBJ)
 	@echo [INFO] Creating Binary: $@
 	@$(CXX)  $^ -o $@ $(TEST_LINKFLAGS) -L. -I $(LIB_PATH)/$(SRC_PATH) -lteslyn_test
 
 
-# check:
-# 	@echo [CHECK] Checking using cppcheck
-# 	@cppcheck --enable=all --inconclusive --template=gcc $(SRC_PATH)/ $(TEST_PATH)/src/
+check:
+	@echo [CHECK] Checking using cppcheck
+	@cppcheck --enable=all --inconclusive --suppress=missingIncludeSystem  --template=gcc  $(LIB_PATH)/$(SRC_PATH)/ $(TEST_PATH)/$(SRC_PATH)
 
 # ~~~~~ examples ~~~~~
 EX_SRC := $(wildcard $(EX_PATH)/*.cpp)
