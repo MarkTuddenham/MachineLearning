@@ -20,7 +20,6 @@ public:
 
   Matrix feedforward(const Matrix &t_inputs);
   void backpropagation(const Matrix &t_inputs, const Matrix &t_targets, double t_eta);
-  void print(int t_precision = 3, std::ostream *t_op = &std::cout);
 
   enum Activation
   {

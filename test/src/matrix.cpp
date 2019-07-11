@@ -128,6 +128,7 @@ TEST_CASE("Matrix Multiplication", "[matrix]")
     SECTION(" by matrix")
     {
         Matrix m_c = Matrix(n_a_rows, n_a_rows, a * b * n_a_cols, "Expected");
+        std::cout << m_c;
         REQUIRE(m_a * m_b == m_c);
     }
 }

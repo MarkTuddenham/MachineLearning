@@ -16,11 +16,12 @@ install:
   - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-8 90
 
 
-compiler: gcc
+compiler: g++
 
-script: 
+script:
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
   - make test
-  - test/run-tests
+  - ./run-tests
 
 after_success:
-  - coveralls -b . --exclude include --exclude test --gcov-options '\-lp'
+  - coveralls -b . -e test/include/ -e test/src/ -e lib/include/ -e ex/ --gcov-options '\-lp'
