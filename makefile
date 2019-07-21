@@ -1,3 +1,5 @@
+LD_LIBRARY_PATH+=:$(shell pwd)
+
 # ~~~~~ COMMANDS ~~~~~
 CXX := $(CXX)
 
@@ -29,7 +31,7 @@ TEST_SO := libteslyn_test.so
 # ~~~~~ BUILD RULES ~~~~~
 .PHONY: build build-all build-lib build-test \
 clean clean-all clean-lib clean-test \
-examples install
+examples test
 
 .DEFAULT_GOAL := build-lib
 
@@ -69,6 +71,8 @@ TEST_SRC := $(wildcard $(TEST_PATH)/$(SRC_PATH)/*.cpp) $(wildcard $(TEST_PATH)/$
 TEST_OBJ = $(patsubst $(TEST_PATH)/$(SRC_PATH)/%,$(TEST_PATH)/$(BUILD_PATH)/%,$(TEST_SRC:.cpp=.o))
 
 test: build-test $(TEST_TARGET)
+	@echo "[INFO] Running Tests: $@"
+	@./$(TEST_TARGET)
 
 build-test: $(TEST_SO)
 
@@ -90,7 +94,7 @@ $(TEST_TARGET): $(TEST_OBJ)
 	@echo [INFO] Creating Binary: $@
 	@$(CXX)  $^ -o $@ $(TEST_LINKFLAGS) -L. -I $(LIB_PATH)/$(SRC_PATH) -lteslyn_test
 
-
+# ~~~~~ check ~~~~~
 check:
 	@echo [CHECK] Checking using cppcheck
 	@cppcheck --enable=all --inconclusive --suppress=missingIncludeSystem  --template=gcc  $(LIB_PATH)/$(SRC_PATH)/ $(TEST_PATH)/$(SRC_PATH)
