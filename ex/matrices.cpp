@@ -18,7 +18,7 @@ int main()
     Matrix m1(3, 2, 1.4, "M1");
     m1.randomise();
     Teslyn::display::print_matrix(m1);
-    Teslyn::display::print_matrix(m1.transpose());
+    Teslyn::display::print_matrix(m1.transpose().set_name("M1'"));
 
     Matrix m2 = Matrix::from_array({1, 2, 3, 4, 5, 6}).reshape(3, 2).set_name("M2");
     Teslyn::display::print_matrix(m2);
@@ -28,8 +28,8 @@ int main()
     Teslyn::display::print_matrix(m3);
     Teslyn::display::print_matrix(m4);
 
-    Teslyn::display::print_matrix(m3 * m4);
+    Teslyn::display::print_matrix((m3 * m4).set_name("M3xM4"));
 
-    Teslyn::display::print_matrix(m1.add(m2).set_name("M1+M2"));
-    Teslyn::display::print_matrix(m1.multiply(m2.transpose()).set_name("M1xM2'"));
+    Teslyn::display::print_matrix((m1 + m2).set_name("M1+M2"));
+    Teslyn::display::print_matrix((m1 * m2.transpose()).set_name("M1xM2'"));
 }

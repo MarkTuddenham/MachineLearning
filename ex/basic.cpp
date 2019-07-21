@@ -16,13 +16,14 @@ using std::endl;
 
 int main()
 {
-  std::cout << "Neural Networks :)\n";
+  std::cout << "Neural Networks :)\n\n";
 
   //define nn architecture
   std::vector<int> layers = {2, 4, 2};
   //make nn
   NeuralNetwork nn(layers);
   print_nn(nn);
+  std::cout << "\n";
 
   auto f = [](const Matrix &m) {
     auto flat = m.get_flattened();
@@ -60,10 +61,7 @@ int main()
        << "~~~~~~~~ NN Trained "
        << "in "
        << (stop_s - start_s) / double(CLOCKS_PER_SEC)
-       << "s ~~~~~~~~"
-       << std::endl;
-
-  print_nn(nn);
+       << "s ~~~~~~~~\n\n";
 
   //test on same inputs
   o = nn.feedforward(inp1);

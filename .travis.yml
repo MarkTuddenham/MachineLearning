@@ -19,9 +19,8 @@ install:
 compiler: g++
 
 script:
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
+  - export LD_LIBRARY_PATH=:$LD_LIBRARY_PATH:$pwd
   - make test
-  - ./run-tests
 
 after_success:
   - coveralls -b . -e test/include/ -e test/src/ -e lib/include/ -e ex/ --gcov-options '\-lp'

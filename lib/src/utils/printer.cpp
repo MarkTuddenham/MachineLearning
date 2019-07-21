@@ -17,35 +17,39 @@ void print_matrix(const Matrix &m, int t_precision, std::ostream *t_op)
     *t_op << m.get_rows() << 'x' << m.get_cols() << " Matrix:\n";
     *t_op << std::setprecision(t_precision) << std::fixed;
 
-    for (auto const &v : m.get_flattened())
+    std::vector<double> values = m.get_flattened();
+
+    for (size_t i = 0; i < m.get_rows(); ++i)
     {
-        // TODO format properly for n dimensions
-        // for (auto const &v : r)
-        // {
-        *t_op << " | ";
+        for (size_t j = 0; j < m.get_cols(); ++j)
+        {
+            int ind = i * m.get_cols() + j;
 
-        // add extra space to account for minus sign
-        if (v > 0)
-            *t_op << " ";
+            *t_op << " | ";
 
-        *t_op << v;
+            // add extra space to account for minus sign
+            if (values[ind] > 0)
+                *t_op << " ";
+
+            *t_op << values[ind] << " ";
+        }
+        *t_op << " |\n";
     }
-    *t_op << " |\n";
-    // }
 }
 
-void print_nn(const NeuralNetwork &nn, int t_precision, std::ostream *t_op)
+void print_nn(const NeuralNetwork &nn, std::ostream *t_op)
 {
-    // *t_op << "\n~~~~~~~~~~ # Neural Network # ~~~~~~~~~~";
+    *t_op << "~~~~~~~~~~ # Neural Network # ~~~~~~~~~~\n";
+    *t_op << "Layers:\n";
 
-    // for (size_t i = 0; i < m_weights.size(); ++i)
-    // {
-    //     *t_op << "\n";
-    //     m_weights[i].print(t_precision, t_op);
-    //     *t_op << "\n";
-    //     m_biases[i].print(t_precision, t_op);
-    // }
-    // *t_op << "~~~~~~~~~~ # ~~~~~~~~~~~~~~ # ~~~~~~~~~~\n\n";
+    for (auto l : nn.get_layers())
+    {
+        *t_op << "   - Nodes: " << l;
+        // *t_op << "Activ: " << l;
+        *t_op << "\n";
+    }
+
+    *t_op << "~~~~~~~~~~ # ~~~~~~~~~~~~~~ # ~~~~~~~~~~\n";
 }
 
 } // namespace Teslyn::display

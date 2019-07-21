@@ -42,12 +42,11 @@ Matrix Matrix::multiply(const Matrix &t_m) const
   {
     Matrix res(m_rows, t_m.m_cols);
     Matrix mt = t_m.transpose();
-    unsigned int first_start, first_end, second_start;
     for (unsigned int i = 0; i < res.get_size(); ++i)
     {
-      first_start = i / res.get_cols();
-      first_end = first_start + get_cols();
-      second_start = i % res.get_cols();
+      unsigned int first_start = i / res.get_cols();
+      unsigned int first_end = first_start + get_cols();
+      unsigned int second_start = i % res.get_cols();
 
       res.m_data[i] = std::inner_product(begin(m_data) + first_start, begin(m_data) + first_end, begin(t_m.m_data) + second_start, 0.0);
     }
@@ -63,10 +62,9 @@ Matrix Matrix::operator*(const Matrix &t_m) const
 Matrix Matrix::transpose(void) const
 {
   Matrix t(m_cols, m_rows);
-  unsigned int new_ind;
   for (unsigned int i = 0; i < t.get_size(); ++i)
   {
-    new_ind = (i % m_rows) * m_cols + i / m_rows;
+    unsigned int new_ind = (i % m_rows) * m_cols + i / m_rows;
     t.m_data[new_ind] = m_data[i];
   }
   return t;

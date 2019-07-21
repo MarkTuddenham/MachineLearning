@@ -1,11 +1,13 @@
+LD_LIBRARY_PATH+=:$(shell pwd)
+
 # ~~~~~ COMMANDS ~~~~~
 CXX := $(CXX)
 
 LIB_CCFLAGS := -std=c++17 -O3 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fPIC
 LIB_LINKFLAGS := 
 
-TEST_CCFLAGS := -std=c++17 -O0 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fPIC -fprofile-arcs -ftest-coverage #-fsanitize=address
-TEST_LINKFLAGS :=  -fprofile-arcs --coverage
+TEST_CCFLAGS := -std=c++17 -O0 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fPIC -fprofile-arcs -ftest-coverage -fsanitize=address
+TEST_LINKFLAGS :=  -fprofile-arcs --coverage -fsanitize=address
 
 RM := rm
 
@@ -29,7 +31,7 @@ TEST_SO := libteslyn_test.so
 # ~~~~~ BUILD RULES ~~~~~
 .PHONY: build build-all build-lib build-test \
 clean clean-all clean-lib clean-test \
-examples install
+examples test
 
 .DEFAULT_GOAL := build-lib
 
@@ -37,11 +39,12 @@ clean: clean-all
 build: build-lib
 
 # ~~~~~ main ~~~~~
-build-lib: $(LIB_SO) 
+build-lib: $(LIB_SO)
 
 $(LIB_SO): $(LIB_OBJ)
 	@echo "[INFO] Building $@"
-	@$(CXX) -shared -Wl,-soname,$@ -o $@ $^
+	@$(CXX) -shared -Wl,-soname,$@ -o $@ $(LIB_LINKFLAGS) $^
+
 
 $(LIB_PATH)/$(BUILD_PATH)/%.o: $(LIB_PATH)/$(SRC_PATH)/%.cpp
 	@echo [CXX] $<
@@ -69,6 +72,8 @@ TEST_SRC := $(wildcard $(TEST_PATH)/$(SRC_PATH)/*.cpp) $(wildcard $(TEST_PATH)/$
 TEST_OBJ = $(patsubst $(TEST_PATH)/$(SRC_PATH)/%,$(TEST_PATH)/$(BUILD_PATH)/%,$(TEST_SRC:.cpp=.o))
 
 test: build-test $(TEST_TARGET)
+	@echo "[INFO] Running Tests: $@"
+	@./$(TEST_TARGET)
 
 build-test: $(TEST_SO)
 
@@ -90,7 +95,7 @@ $(TEST_TARGET): $(TEST_OBJ)
 	@echo [INFO] Creating Binary: $@
 	@$(CXX)  $^ -o $@ $(TEST_LINKFLAGS) -L. -I $(LIB_PATH)/$(SRC_PATH) -lteslyn_test
 
-
+# ~~~~~ check ~~~~~
 check:
 	@echo [CHECK] Checking using cppcheck
 	@cppcheck --enable=all --inconclusive --suppress=missingIncludeSystem  --template=gcc  $(LIB_PATH)/$(SRC_PATH)/ $(TEST_PATH)/$(SRC_PATH)
