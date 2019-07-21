@@ -1,7 +1,7 @@
 #include <catch.hpp>
 #include <sstream>
 
-#include <matrix.hpp>
+#include "matrix.hpp"
 
 #include "utils.hpp"
 
@@ -10,10 +10,12 @@ using Teslyn::Matrix;
 TEST_CASE("Matrix Constructor", "[matrix]")
 {
     unsigned int n_rows = 5, n_cols = 3;
+    std::string name = "M";
 
-    Matrix m = Matrix(n_rows, n_cols);
+    Matrix m = Matrix(n_rows, n_cols, 1, name);
     REQUIRE(m.get_rows() == n_rows);
     REQUIRE(m.get_cols() == n_cols);
+    REQUIRE(m.get_name() == name);
 }
 
 TEST_CASE("Matrix Zeros", "[matrix]")
@@ -77,11 +79,10 @@ TEST_CASE("Matrix from_array", "[matrix]")
     }
 }
 
-TEST_CASE("Matrix Transpose", "[matrix][!mayfail]")
+TEST_CASE("Matrix Transpose", "[matrix]")
 {
-    unsigned int n_rows = 5, n_cols = 3;
-    Matrix m_a = Matrix(n_rows, n_cols).randomise();
-    Matrix m_b = Matrix(n_cols, n_rows);
+    Matrix m_a = Matrix::from_array({1, 2, 3, 4});
+    Matrix m_b = Matrix::from_array({1, 2, 3, 4}).reshape(m_a.get_cols(), m_a.get_rows());
 
     REQUIRE(m_a.transpose() == m_b);
 }
