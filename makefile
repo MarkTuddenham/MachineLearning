@@ -6,8 +6,8 @@ CXX := $(CXX)
 LIB_CCFLAGS := -std=c++17 -O3 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fPIC
 LIB_LINKFLAGS := 
 
-TEST_CCFLAGS := -std=c++17 -O0 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fPIC -fprofile-arcs -ftest-coverage #-fsanitize=address
-TEST_LINKFLAGS :=  -fprofile-arcs --coverage
+TEST_CCFLAGS := -std=c++17 -O0 -pthread -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -fPIC -fprofile-arcs -ftest-coverage -fsanitize=address
+TEST_LINKFLAGS :=  -fprofile-arcs --coverage -fsanitize=address
 
 RM := rm
 
