@@ -39,11 +39,12 @@ clean: clean-all
 build: build-lib
 
 # ~~~~~ main ~~~~~
-build-lib: $(LIB_SO) 
+build-lib: $(LIB_SO)
 
 $(LIB_SO): $(LIB_OBJ)
 	@echo "[INFO] Building $@"
-	@$(CXX) -shared -Wl,-soname,$@ -o $@ $^
+	@$(CXX) -shared -Wl,-soname,$@ -o $@ $(LIB_LINKFLAGS) $^
+
 
 $(LIB_PATH)/$(BUILD_PATH)/%.o: $(LIB_PATH)/$(SRC_PATH)/%.cpp
 	@echo [CXX] $<
