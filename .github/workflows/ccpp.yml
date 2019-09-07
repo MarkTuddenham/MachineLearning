@@ -26,4 +26,4 @@ jobs:
       - name: make test
         run: LD_LIBRARY_PATH=$pwd make test
       - name: coveralls
-        run: pip3 install wheel setuptools cpp-coveralls && make coveralls
+        run: pip3 install wheel setuptools && pip3 install cpp-coveralls && make coveralls
