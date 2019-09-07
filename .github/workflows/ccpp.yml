@@ -22,12 +22,10 @@ jobs:
       - name: install cppcheck
         run: sudo apt-get install cppcheck
       - name: install coveralls
-        run:  pip install cpp-coveralls
+        run: pip3 install wheel setuptools && pip3 install --user cpp-coveralls
       - name: make check
         run: make check
       - name: make test
         run: LD_LIBRARY_PATH=$pwd make test
       - name: coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.github_token }}
+        run: make coveralls
