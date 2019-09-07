@@ -102,7 +102,13 @@ check:
 
 # ~~~~~ coveralls ~~~~~
 coveralls:
-	coveralls -b . -e $(TEST_PATH)/$(INCLUDE_PATH)/ -e $(TEST_PATH)/$(SRC_PATH)/ -e $(LIB_PATH)/$(INCLUDE_PATH)/ -e $(EX_PATH)/ --gcov-options '\-lp'
+	@echo [COV] Creating cov data
+	@coveralls -b . \
+	-e $(TEST_PATH)/$(INCLUDE_PATH)/ \
+	-e $(TEST_PATH)/$(SRC_PATH)/ \
+	-e $(LIB_PATH)/$(INCLUDE_PATH)/ \
+	-e $(EX_PATH)/ \
+	--gcov-options '\-lp'
 
 # ~~~~~ examples ~~~~~
 EX_SRC := $(wildcard $(EX_PATH)/*.cpp)
