@@ -29,7 +29,7 @@ LIB_SO := libteslyn.so
 TEST_SO := libteslyn_test.so
 
 # ~~~~~ BUILD RULES ~~~~~
-.PHONY: build build-all build-lib build-test \
+.PHONY: build build-lib build-test \
 clean clean-all clean-lib clean-test \
 examples test
 
@@ -99,6 +99,10 @@ $(TEST_TARGET): $(TEST_OBJ)
 check:
 	@echo [CHECK] Checking using cppcheck
 	@cppcheck --enable=all --inconclusive --suppress=missingIncludeSystem  --template=gcc  $(LIB_PATH)/$(SRC_PATH)/ $(TEST_PATH)/$(SRC_PATH)
+
+# ~~~~~ coveralls ~~~~~
+coveralls:
+	coveralls -b . -e $(TEST_PATH)/$(INCLUDE_PATH)/ -e $(TEST_PATH)/$(SRC_PATH)/ -e $(LIB_PATH)/$(INCLUDE_PATH)/ -e $(EX_PATH)/ --gcov-options '\-lp'
 
 # ~~~~~ examples ~~~~~
 EX_SRC := $(wildcard $(EX_PATH)/*.cpp)

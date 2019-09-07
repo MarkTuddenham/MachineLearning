@@ -9,18 +9,25 @@ jobs:
     - uses: actions/checkout@v1
     - name: make build
       run: make build
-    - name: make check
-      run: make check
+
   
   test:
       name: Test on ${{ matrix.os }}
       runs-on: ${{ matrix.os }}
       strategy:
         matrix:
-          os: [ubuntu-latest, windows-latest, macOS-latest]
+          os: [ubuntu-latest]
       steps:
       - uses: actions/checkout@v1
-      - name: make build-test
-        run: make build-test
-      - name: run tests
-        run: ./run-tests
+      - name: install cppcheck
+        run: sudo apt-get install cppcheck
+      - name: install coveralls
+        run:  pip install cpp-coveralls
+      - name: make check
+        run: make check
+      - name: make test
+        run: LD_LIBRARY_PATH=$pwd make test
+      - name: coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
