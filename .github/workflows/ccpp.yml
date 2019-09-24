@@ -23,5 +23,13 @@ jobs:
         run: sudo apt-get install cppcheck && make check
       - name: unit tests
         run: LD_LIBRARY_PATH=$pwd make test
-      - name: test coverage
-        run: pip3 install wheel setuptools && pip3 install cpp-coveralls && coveralls -b . -e test/include/ -e test/src/ -e lib/include/ -e ex/ --gcov-options '\-lp'
+      - name: test
+        run: make test
+      - name: lcov
+        run: lcov --capture --directory . --output-file coverage.info
+      - name: coveralls
+        uses: coverallsapp/github-action@v1.0.1
+        with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: coverage.info
+
