@@ -23,8 +23,6 @@ jobs:
         run: sudo apt-get install cppcheck && make check
       - name: unit tests
         run: LD_LIBRARY_PATH=$pwd make test
-      - name: test
-        run: make test
       - name: lcov
         run: lcov --capture --directory . --output-file coverage.info
       - name: coveralls
