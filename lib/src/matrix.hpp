@@ -21,6 +21,8 @@ public:
   Matrix() = delete;
   Matrix(unsigned int t_rows, unsigned int t_cols, double t_fill = 0, std::string t_name = "M");
 
+  Matrix operator[](unsigned int t_i) const;
+
   Matrix set_name(const std::string &t_name);
   std::string get_name() const;
 
@@ -32,6 +34,8 @@ public:
 
   Matrix multiply(const Matrix &t_m) const;
   Matrix operator*(const Matrix &t_m) const;
+
+  Matrix reciprocal() const;
 
   Matrix add(const Matrix &) const;
   Matrix operator+(const Matrix &t_m) const;
@@ -50,6 +54,7 @@ public:
   static Matrix from_array(const std::vector<double> &t_arr);
   static Matrix ones(unsigned int t_rows, unsigned int t_cols);
   static Matrix zeros(unsigned int t_rows, unsigned int t_cols);
+  static Matrix I(unsigned int t_size);
 };
 
 } // namespace Teslyn

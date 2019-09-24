@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <numeric>
+#include <cmath>
 #include <random>
 #include <iomanip>
 
@@ -10,7 +11,7 @@ namespace Teslyn
 
 Matrix::Matrix(unsigned int t_rows, unsigned int t_cols, double t_fill, std::string t_name) : m_rows(t_rows), m_cols(t_cols), m_name(t_name)
 {
-  this->m_data = std::vector<double>(m_rows * m_cols, t_fill);
+  m_data = std::vector<double>(m_rows * m_cols, t_fill);
 }
 
 bool Matrix::operator==(const Matrix &t_m) const
@@ -21,36 +22,56 @@ bool Matrix::operator==(const Matrix &t_m) const
 }
 
 //~~~~~~~~~~~~~~~~~ACCESS~~~~~~~~~~~~~~~~~~~~~~~~~
-// unsigned long operator[](unsigned int i) const
-// {
-//   return m_data[i];
-// }
+
+// Gets the row as a Matrix
+Matrix Matrix::operator[](unsigned int ind) const
+{
+
+  unsigned int size = m_rows > 1 ? m_cols : m_rows;
+
+  std::vector<double> ret(size);
+
+  unsigned int first = ind * size;
+  std::copy(begin(m_data) + first, begin(m_data) + first + size, begin(ret));
+
+  return Matrix::from_array(ret);
+}
 
 //~~~~~~~~~~~~~~~~~MATHS~~~~~~~~~~~~~~~~~~~~~~~~~
-// [this][m]
 
 Matrix Matrix::multiply(const Matrix &t_m) const
 {
-  //check dimensions
-  if (m_cols != t_m.m_rows)
+
+  // See if we are multiplying by a scaler
+  bool is_left_scalar = m_cols == 1 && m_rows == 1;
+  bool is_right_scalar = t_m.m_cols == 1 && t_m.m_rows == 1;
+  if (is_left_scalar || is_right_scalar)
   {
-    throw std::invalid_argument("Internal dimensions of matrices do not match: " +
-                                std::to_string(m_rows) + "x" + std::to_string(m_cols) + " and " +
-                                std::to_string(t_m.m_rows) + "x" + std::to_string(t_m.m_cols));
+    return hadamard(t_m);
   }
   else
   {
-    Matrix res(m_rows, t_m.m_cols);
-    Matrix mt = t_m.transpose();
-    for (unsigned int i = 0; i < res.get_size(); ++i)
+    //check dimensions
+    if (m_cols != t_m.m_rows)
     {
-      unsigned int first_start = i / res.get_cols();
-      unsigned int first_end = first_start + get_cols();
-      unsigned int second_start = i % res.get_cols();
-
-      res.m_data[i] = std::inner_product(begin(m_data) + first_start, begin(m_data) + first_end, begin(t_m.m_data) + second_start, 0.0);
+      throw std::invalid_argument("Internal dimensions of matrices do not match: " +
+                                  std::to_string(m_rows) + "x" + std::to_string(m_cols) + " and " +
+                                  std::to_string(t_m.m_rows) + "x" + std::to_string(t_m.m_cols));
     }
-    return res;
+    else
+    {
+      Matrix res(m_rows, t_m.m_cols);
+      Matrix mt = t_m.transpose();
+      for (unsigned int i = 0; i < res.get_size(); ++i)
+      {
+        unsigned int first_start = m_cols * floor(i / t_m.m_cols);
+        unsigned int first_end = first_start + m_cols;
+        unsigned int second_start = (i * mt.m_rows) % mt.get_size();
+
+        res.m_data[i] = std::inner_product(begin(m_data) + first_start, begin(m_data) + first_end, begin(mt.m_data) + second_start, 0.0);
+      }
+      return res;
+    }
   }
 }
 
@@ -64,10 +85,18 @@ Matrix Matrix::transpose(void) const
   Matrix t(m_cols, m_rows);
   for (unsigned int i = 0; i < t.get_size(); ++i)
   {
-    unsigned int new_ind = (i % m_rows) * m_cols + i / m_rows;
-    t.m_data[new_ind] = m_data[i];
+    unsigned int old_ind = (i % m_rows) * m_cols + i / m_rows;
+    t.m_data[i] = m_data[old_ind];
   }
   return t;
+}
+
+Matrix Matrix::reciprocal() const
+{
+  return apply(
+      [](double x) {
+        return (1 / x);
+      });
 }
 
 Matrix Matrix::add(const Matrix &t_m) const
@@ -138,7 +167,7 @@ Matrix Matrix::reshape(unsigned int t_rows, unsigned int t_cols)
 
 Matrix Matrix::elementwise(const Matrix &t_m, std::function<double(double, double)> t_f) const
 {
-  // Deal with scalar multiplication
+  // Deal with scalar
   bool amIScalar = get_rows() == 1 && get_cols() == 1;
   bool isOtherScalar = t_m.get_rows() == 1 && t_m.get_cols() == 1;
 
@@ -191,11 +220,7 @@ Matrix Matrix::apply(std::function<double(double)> t_f) const
 Matrix Matrix::from_array(const std::vector<double> &t_arr)
 {
   Matrix res(1, t_arr.size());
-
-  for (unsigned int i = 0; i < res.get_size(); ++i)
-  {
-    res.m_data[i] = t_arr[i];
-  }
+  res.m_data = t_arr;
   return res;
 }
 
@@ -207,6 +232,17 @@ Matrix Matrix::ones(unsigned int t_rows, unsigned int t_cols)
 Matrix Matrix::zeros(unsigned int t_rows, unsigned int t_cols)
 {
   return Matrix(t_rows, t_cols, 0);
+}
+
+Matrix Matrix::I(unsigned int t_size)
+{
+  Matrix m = Matrix::zeros(t_size, t_size);
+
+  for (int i = 0; i < pow(t_size, 2); i += t_size + 1)
+  {
+    m.m_data[i] = 1;
+  }
+  return m.set_name("I");
 }
 
 std::vector<double> Matrix::get_flattened(void) const
