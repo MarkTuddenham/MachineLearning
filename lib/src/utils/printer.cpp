@@ -28,7 +28,7 @@ void print_matrix(const Matrix &m, int t_precision, std::ostream *t_op)
             *t_op << " | ";
 
             // add extra space to account for minus sign
-            if (values[ind] > 0)
+            if (values[ind] >= 0)
                 *t_op << " ";
 
             *t_op << values[ind] << " ";
