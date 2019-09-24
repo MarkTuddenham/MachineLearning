@@ -1,4 +1,3 @@
-
 #include <functional>
 #include <cmath>
 
@@ -114,9 +113,9 @@ Matrix NeuralNetwork::apply_activation(const Matrix &t_m, Activation t_a)
       return std::tanh(d);
     };
     break;
-    default:
-      throw std::invalid_argument("Unknown Activation Function.");
-      break;
+  default:
+    throw std::invalid_argument("Unknown Activation Function.");
+    break;
   }
 
   return t_m.apply(f);
