@@ -24,7 +24,7 @@ jobs:
       - name: unit tests
         run: LD_LIBRARY_PATH=$pwd make test
       - name: lcov
-        run: git clone https://github.com/linux-test-project/lcov.git && sudo make -C lcov install && sudo cpan JSON PerlIO::gzip && lcov --capture --directory . --output-file coverage.info
+        run: git clone https://github.com/linux-test-project/lcov.git && sudo make -C lcov install && sudo cpan JSON PerlIO::gzip && lcov --capture --directory test/build --output-file coverage.info
       - name: coveralls
         uses: coverallsapp/github-action@v1.0.1
         with:
