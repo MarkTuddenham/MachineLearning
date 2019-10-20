@@ -27,10 +27,10 @@ int main()
   print_nn(nn);
   std::cout << "\n";
 
-  // not - xor
+  // xor function
   auto f = [](const Matrix &m) {
     auto flat = m.get_flattened();
-    return (flat.front() == flat.back()) ? Matrix::from_array({1.0}) : Matrix::from_array({0.0});
+    return (flat.front() == flat.back()) ? Matrix::from_array({0.0}) : Matrix::from_array({1.0});
   };
 
   // test on some inputs

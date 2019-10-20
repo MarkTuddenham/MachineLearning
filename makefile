@@ -113,15 +113,15 @@ coveralls:
 
 # ~~~~~ examples ~~~~~
 EX_SRC := $(wildcard $(EX_PATH)/*.cpp)
-EX_RUNNABLES = $(EX_SRC:.cpp=)
+EX_STRIPPED := $(EX_SRC:.cpp=)
+EX_RUNNABLES = $(EX_STRIPPED:ex/%=ex/bin/%)
 
 examples: build-lib $(EX_RUNNABLES)
 
-$(EX_PATH)/%: $(EX_PATH)/%.cpp
-	@echo [CXX] $<
+$(EX_PATH)/bin/%: $(EX_PATH)/%.cpp
+	@echo [CXX] $< "->" $@
+	@mkdir -p $(EX_PATH)/bin
 	@$(CXX) $< -o $@ -L. -I $(LIB_PATH) -lteslyn
-	@mkdir -p $(EX_PATH)/bin/
-	@mv $@ $(EX_PATH)/bin/
 
 # ~~~~~ clean ~~~~~
 clean-all: clean-lib clean-test
