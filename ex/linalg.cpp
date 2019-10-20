@@ -1,9 +1,9 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "matrix.hpp"
-#include "linalg/inversion.hpp"
-#include "utils/printer.hpp"
+#include "teslyn/matrix.hpp"
+#include "teslyn/linalg/inversion.hpp"
+#include "teslyn/utils/printer.hpp"
 
 using Teslyn::Matrix;
 using Teslyn::NeuralNetwork;

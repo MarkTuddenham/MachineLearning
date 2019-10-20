@@ -1,8 +1,8 @@
 #include <functional>
 #include <cmath>
 
-#include "neural_network.hpp"
-#include "matrix.hpp"
+#include "teslyn/neural_network.hpp"
+#include "teslyn/matrix.hpp"
 
 namespace Teslyn
 {

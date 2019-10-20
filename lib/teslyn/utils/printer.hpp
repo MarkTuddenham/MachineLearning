@@ -1,5 +1,5 @@
-#include "matrix.hpp"
-#include "neural_network.hpp"
+#include "teslyn/matrix.hpp"
+#include "teslyn/neural_network.hpp"
 
 using Teslyn::Matrix;
 using Teslyn::NeuralNetwork;

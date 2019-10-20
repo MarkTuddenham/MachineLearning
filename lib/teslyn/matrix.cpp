@@ -1,10 +1,10 @@
-#include "matrix.hpp"
-
 #include <stdexcept>
 #include <numeric>
 #include <cmath>
 #include <random>
 #include <iomanip>
+
+#include "teslyn/matrix.hpp"
 
 namespace Teslyn
 {

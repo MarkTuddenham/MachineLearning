@@ -12,17 +12,18 @@ TEST_LINKFLAGS :=  -fprofile-arcs --coverage -fsanitize=address
 RM := rm
 
 # ~~~~~ BUILD DIRS & FOLDERS ~~~~~
-SRC_PATH := src
 BUILD_PATH := build
 INCLUDE_PATH := include
+SRC_PATH_TEST := src
+SRC_PATH_LIB := teslyn
 
 LIB_PATH := lib
 TEST_PATH := test
 EX_PATH := ex
 
-LIB_SRC := $(wildcard $(LIB_PATH)/$(SRC_PATH)/*.cpp) $(wildcard $(LIB_PATH)/$(SRC_PATH)/**/*.cpp)
-LIB_OBJ = $(patsubst $(LIB_PATH)/$(SRC_PATH)/%,$(LIB_PATH)/$(BUILD_PATH)/%,$(LIB_SRC:.cpp=.o))
-# HEADER := $(wildcard $(SRC_PATH)/*.hpp)
+LIB_SRC := $(wildcard $(LIB_PATH)/$(SRC_PATH_LIB)/*.cpp) $(wildcard $(LIB_PATH)/$(SRC_PATH_LIB)/**/*.cpp)
+LIB_OBJ = $(patsubst $(LIB_PATH)/$(SRC_PATH_LIB)/%,$(LIB_PATH)/$(BUILD_PATH)/%,$(LIB_SRC:.cpp=.o))
+# HEADER := $(wildcard $(SRC_PATH_LIB)/*.hpp)
 # PRECOMPILED_HEADER := $(HEADER:.hpp=.hpp.gch)
 
 LIB_SO := libteslyn.so
@@ -46,10 +47,10 @@ $(LIB_SO): $(LIB_OBJ)
 	@$(CXX) -shared -Wl,-soname,$@ -o $@ $(LIB_LINKFLAGS) $^
 
 
-$(LIB_PATH)/$(BUILD_PATH)/%.o: $(LIB_PATH)/$(SRC_PATH)/%.cpp
+$(LIB_PATH)/$(BUILD_PATH)/%.o: $(LIB_PATH)/$(SRC_PATH_LIB)/%.cpp
 	@echo [CXX] $<
 	@mkdir -p $(@D)
-	@$(CXX) $(LIB_CCFLAGS) -o $@ -c $< -I $(LIB_PATH)/$(INCLUDE_PATH) -I $(LIB_PATH)/$(SRC_PATH)
+	@$(CXX) $(LIB_CCFLAGS) -o $@ -c $< -I $(LIB_PATH)/$(INCLUDE_PATH) -I $(LIB_PATH)/
 
 
 # INSTALL_DIR := /usr/local/lib 
@@ -66,10 +67,10 @@ $(LIB_PATH)/$(BUILD_PATH)/%.o: $(LIB_PATH)/$(SRC_PATH)/%.cpp
 # ~~~~~ test ~~~~~
 TEST_TARGET := run-tests
 
-TEST_LIB_OBJ := $(patsubst $(LIB_PATH)/$(SRC_PATH)/%,$(TEST_PATH)/$(BUILD_PATH)/%,$(LIB_SRC:.cpp=_lib.o))
+TEST_LIB_OBJ := $(patsubst $(LIB_PATH)/$(SRC_PATH_LIB)/%,$(TEST_PATH)/$(BUILD_PATH)/%,$(LIB_SRC:.cpp=_lib.o))
 
-TEST_SRC := $(wildcard $(TEST_PATH)/$(SRC_PATH)/*.cpp) $(wildcard $(TEST_PATH)/$(SRC_PATH)/**/*.cpp)
-TEST_OBJ = $(patsubst $(TEST_PATH)/$(SRC_PATH)/%,$(TEST_PATH)/$(BUILD_PATH)/%,$(TEST_SRC:.cpp=.o))
+TEST_SRC := $(wildcard $(TEST_PATH)/$(SRC_PATH_TEST)/*.cpp) $(wildcard $(TEST_PATH)/$(SRC_PATH_TEST)/**/*.cpp)
+TEST_OBJ = $(patsubst $(TEST_PATH)/$(SRC_PATH_TEST)/%,$(TEST_PATH)/$(BUILD_PATH)/%,$(TEST_SRC:.cpp=.o))
 
 test: build-test $(TEST_TARGET)
 	@echo "[INFO] Running Tests: $@"
@@ -81,24 +82,24 @@ $(TEST_SO): $(TEST_LIB_OBJ)
 	@echo "[INFO] Building $@"
 	@$(CXX) -shared -Wl,-soname,$@ -o $@ $(TEST_LINKFLAGS) $^
 
-$(TEST_PATH)/$(BUILD_PATH)/%_lib.o: $(LIB_PATH)/$(SRC_PATH)/%.cpp
+$(TEST_PATH)/$(BUILD_PATH)/%_lib.o: $(LIB_PATH)/$(SRC_PATH_LIB)/%.cpp
 	@echo [CXX] $<
 	@mkdir -p $(@D)
 	@$(CXX) $(TEST_CCFLAGS) -o $@ -c $< -I ./$(LIB_PATH)/$(INCLUDE_PATH)
 
-$(TEST_PATH)/$(BUILD_PATH)/%.o: $(TEST_PATH)/$(SRC_PATH)/%.cpp
+$(TEST_PATH)/$(BUILD_PATH)/%.o: $(TEST_PATH)/$(SRC_PATH_TEST)/%.cpp
 	@echo [CXX] $<
 	@mkdir -p $(@D)
-	@$(CXX) $(LIB_CCFLAGS) -o $@ -c $< -I $(TEST_PATH)/$(INCLUDE_PATH) -I $(LIB_PATH)/$(SRC_PATH)
+	@$(CXX) $(LIB_CCFLAGS) -o $@ -c $< -I $(TEST_PATH)/$(INCLUDE_PATH) -I $(LIB_PATH)/
 
 $(TEST_TARGET): $(TEST_OBJ)
 	@echo [INFO] Creating Binary: $@
-	@$(CXX)  $^ -o $@ $(TEST_LINKFLAGS) -L. -I $(LIB_PATH)/$(SRC_PATH) -lteslyn_test
+	@$(CXX)  $^ -o $@ $(TEST_LINKFLAGS) -L. -I $(LIB_PATH)/ -lteslyn_test
 
 # ~~~~~ check ~~~~~
 check:
 	@echo [CHECK] Checking using cppcheck
-	@cppcheck --enable=all --inconclusive --suppress=missingIncludeSystem  --template=gcc  $(LIB_PATH)/$(SRC_PATH)/ $(TEST_PATH)/$(SRC_PATH)
+	@cppcheck --enable=all --inconclusive --suppress=missingIncludeSystem  --template=gcc  $(LIB_PATH)/$(SRC_PATH_LIB)/ $(TEST_PATH)/$(SRC_PATH)
 
 # ~~~~~ coveralls ~~~~~
 coveralls:
@@ -118,7 +119,7 @@ examples: build-lib $(EX_RUNNABLES)
 
 $(EX_PATH)/%: $(EX_PATH)/%.cpp
 	@echo [CXX] $<
-	@$(CXX) $< -o $@ -L. -I $(LIB_PATH)/$(SRC_PATH)/ -lteslyn
+	@$(CXX) $< -o $@ -L. -I $(LIB_PATH)// -lteslyn
 
 # ~~~~~ clean ~~~~~
 clean-all: clean-lib clean-test

@@ -1,6 +1,6 @@
-#include "../matrix.hpp"
+#include "teslyn/matrix.hpp"
 
-#include "inversion.hpp"
+#include "teslyn/linalg/inversion.hpp"
 
 namespace Teslyn::LinAlg
 {

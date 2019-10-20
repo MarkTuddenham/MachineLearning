@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../matrix.hpp"
+#include "teslyn/matrix.hpp"
 
 namespace Teslyn::LinAlg
 {

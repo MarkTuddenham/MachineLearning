@@ -1,6 +1,6 @@
 #pragma once
 
-#include "matrix.hpp"
+#include "teslyn/matrix.hpp"
 #include <vector>
 
 namespace Teslyn
