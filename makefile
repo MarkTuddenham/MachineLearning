@@ -85,7 +85,7 @@ $(TEST_SO): $(TEST_LIB_OBJ)
 $(TEST_PATH)/$(BUILD_PATH)/%_lib.o: $(LIB_PATH)/$(SRC_PATH_LIB)/%.cpp
 	@echo [CXX] $<
 	@mkdir -p $(@D)
-	@$(CXX) $(TEST_CCFLAGS) -o $@ -c $< -I ./$(LIB_PATH)/$(INCLUDE_PATH)
+	@$(CXX) $(TEST_CCFLAGS) -o $@ -c $< -I $(LIB_PATH)/$(INCLUDE_PATH) -I $(LIB_PATH)/
 
 $(TEST_PATH)/$(BUILD_PATH)/%.o: $(TEST_PATH)/$(SRC_PATH_TEST)/%.cpp
 	@echo [CXX] $<

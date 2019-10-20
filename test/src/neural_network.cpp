@@ -1,8 +1,8 @@
 #include <catch.hpp>
 #include <cmath>
 
-#include "matrix.hpp"
-#include "neural_network.hpp"
+#include "teslyn/matrix.hpp"
+#include "teslyn/neural_network.hpp"
 
 // #include "utils.hpp"
 

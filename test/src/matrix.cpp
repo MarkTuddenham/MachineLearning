@@ -1,9 +1,6 @@
 #include <catch.hpp>
-// #include <sstream>
 
-#include "matrix.hpp"
-
-// #include "utils.hpp"
+#include "teslyn/matrix.hpp"
 
 using Teslyn::Matrix;
 

@@ -1,9 +1,9 @@
 #include <catch.hpp>
 #include <sstream>
 
-#include "matrix.hpp"
-#include "neural_network.hpp"
-#include "utils/printer.hpp"
+#include "teslyn/matrix.hpp"
+#include "teslyn/neural_network.hpp"
+#include "teslyn/utils/printer.hpp"
 
 using Teslyn::Matrix;
 using Teslyn::NeuralNetwork;
