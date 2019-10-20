@@ -119,14 +119,16 @@ examples: build-lib $(EX_RUNNABLES)
 
 $(EX_PATH)/%: $(EX_PATH)/%.cpp
 	@echo [CXX] $<
-	@$(CXX) $< -o $@ -L. -I $(LIB_PATH)// -lteslyn
+	@$(CXX) $< -o $@ -L. -I $(LIB_PATH) -lteslyn
+	@mkdir -p $(EX_PATH)/bin/
+	@mv $@ $(EX_PATH)/bin/
 
 # ~~~~~ clean ~~~~~
 clean-all: clean-lib clean-test
 	@echo "[INFO] Cleaning .so files"
 	@$(RM) -rfv *.so
 	@echo "[INFO] Cleaning $(EX_PATH)/"
-	@$(RM) -rfv $(EX_RUNNABLES)
+	@$(RM) -rfv $(EX_PATH)/bin/
 
 clean-lib:
 	@echo "[INFO] Cleaning $(LIB_PATH)/"
