@@ -2,7 +2,6 @@
 # Teslyn
 
 [![GitHub Actions](https://img.shields.io/endpoint.svg?url=https://actions-badge.atrox.dev/MarkTuddenham/Teslyn/badge&label=build&logo=none)](https://actions-badge.atrox.dev/MarkTuddenham/Teslyn/goto)
-[![Build Status](https://travis-ci.org/MarkTuddenham/Teslyn.svg?branch=master)](https://travis-ci.org/MarkTuddenham/Teslyn)
 [![Coverage Status](https://coveralls.io/repos/github/MarkTuddenham/Teslyn/badge.svg?branch=master)](https://coveralls.io/github/MarkTuddenham/Teslyn?branch=master)
 ![GitHub](https://img.shields.io/github/license/marktuddenham/teslyn.svg)
 
