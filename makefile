@@ -134,5 +134,6 @@ clean-lib:
 clean-test:
 	@echo "[INFO] Cleaning $(TEST_PATH)/"
 	@$(RM) -rfv $(TEST_PATH)/$(BUILD_PATH)/*
+	@$(RM) -fv $(TEST_TARGET)
 
 
