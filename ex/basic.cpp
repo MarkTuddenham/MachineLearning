@@ -21,6 +21,7 @@ int main()
 
   //define nn architecture
   std::vector<int> layers = {2, 3, 1};
+
   //make nn
   NeuralNetwork nn(layers);
   print_nn(nn);
@@ -47,24 +48,20 @@ int main()
   o = nn.feedforward(inp4);
   print_matrix(o, 7);
 
-  double lr = 3;
+  double lr = 0.5;
 
-  int start_s = clock();
-
-  //train many sets
-  for (unsigned int i = 0; i < 1'000'000; i++)
   {
-    Matrix x = Matrix::from_array({static_cast<double>(std::rand() % 2), static_cast<double>(std::rand() % 2)});
-    Matrix y = f(x);
-    // std::cout << inp[0] << ":" << inp[1] << "  =  " << t[0] << '\n';
-    nn.backpropagation(x, y, lr);
-  }
+    auto timer = Teslyn::time::Timer("\nTraining");
 
-  int stop_s = clock();
-  cout << "\n~~~~~~~~ NN Trained "
-       << "in "
-       << (stop_s - start_s) / double(CLOCKS_PER_SEC)
-       << "s ~~~~~~~~\n\n";
+    //train many sets
+    for (unsigned int i = 0; i < 10'000; i++)
+    {
+      Matrix x = Matrix::from_array({static_cast<double>(std::rand() % 2), static_cast<double>(std::rand() % 2)});
+      Matrix y = f(x);
+      // std::cout << inp[0] << ":" << inp[1] << "  =  " << t[0] << '\n';
+      nn.backpropagation(x, y, lr);
+    }
+  }
 
   //test on same inputs
   o = nn.feedforward(inp1);
