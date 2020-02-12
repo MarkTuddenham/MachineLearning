@@ -66,10 +66,13 @@ Matrix Matrix::multiply(const Matrix &t_m) const
       for (size_t i = 0; i < res.get_size(); ++i)
       {
         size_t first_start = m_cols * (i / t_m.m_cols);
-        size_t first_end = first_start + m_cols;
         size_t second_start = (i * mt.m_rows) % mt.get_size();
 
-        res.m_data[i] = std::inner_product(begin(m_data) + first_start, begin(m_data) + first_end, begin(mt.m_data) + second_start, 0.0);
+        res.m_data[i] = std::inner_product(
+            begin(m_data) + first_start,
+            begin(m_data) + first_start + m_cols,
+            begin(mt.m_data) + second_start,
+            0.0);
       }
       return res;
     }
@@ -126,7 +129,7 @@ Matrix Matrix::hadamard(const Matrix &t_m) const
   return this->elementwise(t_m, [](double a, double b) { return a * b; });
 }
 
-Matrix& Matrix::randomise(void)
+Matrix &Matrix::randomise(void)
 {
   static double lower_bound = -1;
   static double upper_bound = 1;
@@ -149,7 +152,7 @@ size_t Matrix::get_size() const
   return m_rows * m_cols;
 }
 
-Matrix& Matrix::reshape(size_t t_rows, size_t t_cols)
+Matrix &Matrix::reshape(size_t t_rows, size_t t_cols)
 {
   if (t_rows * t_cols == get_size())
   {
@@ -236,7 +239,6 @@ Matrix Matrix::zeros(size_t t_rows, size_t t_cols)
   return Matrix(t_rows, t_cols, 0);
 }
 
-
 std::vector<double> Matrix::flatten(void) const
 {
   return m_data;
@@ -257,7 +259,7 @@ std::string Matrix::get_name() const
   return m_name;
 }
 
-Matrix& Matrix::set_name(const std::string &t_name)
+Matrix &Matrix::set_name(const std::string &t_name)
 {
   m_name = t_name;
   return *this;
@@ -265,13 +267,13 @@ Matrix& Matrix::set_name(const std::string &t_name)
 
 Matrix Matrix::I(size_t t_size)
 {
-    Matrix m = Matrix::zeros(t_size, t_size);
+  Matrix m = Matrix::zeros(t_size, t_size);
 
-    for (size_t i = 0; i < t_size * t_size; i += t_size + 1)
-    {
-        m.m_data[i] = 1;
-    }
-    return m.set_name("I");
+  for (size_t i = 0; i < t_size * t_size; i += t_size + 1)
+  {
+    m.m_data[i] = 1;
+  }
+  return m.set_name("I");
 }
 
 } // namespace Teslyn

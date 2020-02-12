@@ -17,6 +17,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${EXECUTABLE_OUTPUT_PATH}/lib)
 
-add_subdirectory(Teslyn)
+add_subdirectory(teslyn)
 add_subdirectory(test)
 add_subdirectory(ex)

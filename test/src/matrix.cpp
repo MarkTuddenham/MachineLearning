@@ -81,7 +81,7 @@ TEST_CASE("Matrix Transpose", "[matrix]")
     Matrix m_a = Matrix::from_array({1, 2, 3, 4});
     Matrix m_b = Matrix::from_array({1, 2, 3, 4}).reshape(m_a.get_cols(), m_a.get_rows());
 
-    REQUIRE(m_a.transpose() == m_b);
+    REQUIRE(m_a.t() == m_b);
 }
 
 // TEST_CASE("Matrix Apply", "[matrix][!mayfail]")
