@@ -1,6 +1,6 @@
 #pragma once
 
-#include "teslyn/matrix.hpp"
+#include "teslyn/core/matrix.hpp"
 #include <vector>
 
 namespace Teslyn
@@ -21,7 +21,7 @@ public:
   Matrix feedforward(const Matrix &t_inputs);
   void backpropagation(const Matrix &t_inputs, const Matrix &t_targets, double t_eta);
 
-  enum Activation
+  enum class Activation
   {
     Sigmoid,
     FastSigmoid,

@@ -1,7 +1,7 @@
 #include <iomanip>
 
-#include "teslyn/matrix.hpp"
-#include "teslyn/neural_network.hpp"
+#include "teslyn/core/matrix.hpp"
+#include "teslyn/core/neural_network.hpp"
 
 using Teslyn::Matrix;
 using Teslyn::NeuralNetwork;

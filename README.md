@@ -14,11 +14,25 @@ A from-scratch implementation of Neural Networks.
 
 ---
 
-## Examples
+## Build Process (Linux)
 
 ```bash
-make examples
-./ex/bin/basic
+mkdir -p _build/
+
+cmake -H. -B_build/
+# or
+cmake -H. -B_build/ -DCMAKE_BUILD_TYPE=Debug
+
+# The above line may not work, if it doesn't then use:
+pushd _build/ && cmake .. && popd
+
+cmake --build _build/
+
+# Run the tests
+./bin/TeslynTests
+
+# Run the example
+./bin/TeslynExample
 ```
 
 ---

@@ -1,12 +1,10 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "teslyn/matrix.hpp"
-#include "teslyn/neural_network.hpp"
+#include "teslyn/core/matrix.hpp"
 #include "teslyn/utils/printer.hpp"
 
 using Teslyn::Matrix;
-using Teslyn::NeuralNetwork;
 
 using std::cout;
 using std::endl;

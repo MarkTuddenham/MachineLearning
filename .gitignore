@@ -1,6 +1,9 @@
 ### Custom ###
 .vscode
+.vs
 build/
+_build/
+bin/
 
 # lcov
 lcov/

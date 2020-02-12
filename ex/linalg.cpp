@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "teslyn/matrix.hpp"
+#include "teslyn/core/matrix.hpp"
 #include "teslyn/linalg/inversion.hpp"
 #include "teslyn/utils/printer.hpp"
 

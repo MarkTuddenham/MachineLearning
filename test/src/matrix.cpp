@@ -1,12 +1,12 @@
 #include <catch.hpp>
 
-#include "teslyn/matrix.hpp"
+#include "teslyn/core/matrix.hpp"
 
 using Teslyn::Matrix;
 
 TEST_CASE("Matrix Constructor", "[matrix]")
 {
-    unsigned int n_rows = 5, n_cols = 3;
+    size_t n_rows = 5, n_cols = 3;
     std::string name = "M";
 
     Matrix m = Matrix(n_rows, n_cols, 1, name);
@@ -17,7 +17,7 @@ TEST_CASE("Matrix Constructor", "[matrix]")
 
 TEST_CASE("Matrix Zeros", "[matrix]")
 {
-    unsigned int n_rows = 5, n_cols = 3;
+    size_t n_rows = 5, n_cols = 3;
 
     Matrix m_a = Matrix(n_rows, n_cols, 0);
     Matrix m_b = Matrix::zeros(n_rows, n_cols);
@@ -27,7 +27,7 @@ TEST_CASE("Matrix Zeros", "[matrix]")
 
 TEST_CASE("Matrix Ones", "[matrix]")
 {
-    unsigned int n_rows = 5, n_cols = 3;
+    size_t n_rows = 5, n_cols = 3;
 
     Matrix m_a = Matrix(n_rows, n_cols, 1);
     Matrix m_b = Matrix::ones(n_rows, n_cols);
@@ -37,8 +37,8 @@ TEST_CASE("Matrix Ones", "[matrix]")
 
 TEST_CASE("Matrix Reshape", "[matrix]")
 {
-    unsigned int n_a_rows = 6, n_a_cols = 4;
-    unsigned int n_b_rows = 8, n_b_cols = 3;
+    size_t n_a_rows = 6, n_a_cols = 4;
+    size_t n_b_rows = 8, n_b_cols = 3;
 
     Matrix m_a = Matrix(n_a_rows, n_a_cols, 1);
     Matrix m_b = Matrix(n_b_rows, n_b_cols, 1);
@@ -55,7 +55,7 @@ TEST_CASE("Matrix from_array", "[matrix]")
 {
     SECTION(" for 1D")
     {
-        unsigned int n = 5;
+        size_t n = 5;
         double val = 3;
         Matrix m_a = Matrix(1, n, val);
         std::vector<double> vec(n, val);
@@ -66,7 +66,7 @@ TEST_CASE("Matrix from_array", "[matrix]")
 
     SECTION(" using reshape")
     {
-        unsigned int n_rows = 3, n_cols = 5;
+        size_t n_rows = 3, n_cols = 5;
         double val = 3;
         Matrix m_a = Matrix(n_rows, n_cols, val);
         std::vector<double> vec(n_rows * n_cols, val);
@@ -111,7 +111,7 @@ TEST_CASE("Matrix Randomise", "[matrix]")
 TEST_CASE("Matrix Addition", "[matrix]")
 {
     double a = 4.2, b = 17.73;
-    unsigned int n_rows = 5, n_cols = 3;
+    size_t n_rows = 5, n_cols = 3;
 
     Matrix m_a = Matrix(n_rows, n_cols, a);
     Matrix m_b = Matrix(n_rows, n_cols, b);
@@ -145,7 +145,7 @@ TEST_CASE("Matrix Addition", "[matrix]")
 TEST_CASE("Matrix Subtraction", "[matrix]")
 {
     double a = 4.2, b = 17.73;
-    unsigned int n_rows = 5, n_cols = 3;
+    size_t n_rows = 5, n_cols = 3;
 
     Matrix m_a = Matrix(n_rows, n_cols, a);
     Matrix m_b = Matrix(n_rows, n_cols, b);
@@ -166,7 +166,7 @@ TEST_CASE("Matrix Subtraction", "[matrix]")
 TEST_CASE("Matrix Multiplication", "[matrix]")
 {
     double a = 4.2, b = 17.73;
-    unsigned int n_a_rows = 2, n_a_cols = 7;
+    size_t n_a_rows = 2, n_a_cols = 7;
 
     Matrix m_a = Matrix(n_a_rows, n_a_cols, a);
     Matrix m_b = Matrix(n_a_cols, n_a_rows, b);
@@ -193,7 +193,7 @@ TEST_CASE("Matrix Multiplication", "[matrix]")
 TEST_CASE("Matrix Hadamard", "[matrix]")
 {
     double a = 4.2, b = 17.73;
-    unsigned int n_rows = 5, n_cols = 3;
+    size_t n_rows = 5, n_cols = 3;
 
     Matrix m_a = Matrix(n_rows, n_cols, a);
     Matrix m_b = Matrix(n_rows, n_cols, b);

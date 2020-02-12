@@ -1,8 +1,9 @@
-#include <functional>
 #include <cmath>
+#include <functional>
+#include <string>
 
-#include "teslyn/neural_network.hpp"
-#include "teslyn/matrix.hpp"
+#include "teslyn/core/neural_network.hpp"
+#include "teslyn/core/matrix.hpp"
 
 namespace Teslyn
 {
@@ -41,7 +42,7 @@ Matrix NeuralNetwork::feedforward(const Matrix &t_inputs)
   for (size_t i = 0; i < m_layers.size() - 1; ++i)
   {
     Matrix net = (out * m_weights[i]) + m_biases[i];
-    out = NeuralNetwork::apply_activation(net, NeuralNetwork::Sigmoid);
+    out = NeuralNetwork::apply_activation(net, NeuralNetwork::Activation::Sigmoid);
 
     out.set_name("out_" + std::to_string(i + 1));
     m_outs.push_back(out);
@@ -98,17 +99,17 @@ Matrix NeuralNetwork::apply_activation(const Matrix &t_m, Activation t_a)
 
   switch (t_a)
   {
-  case Sigmoid:
+  case Activation::Sigmoid:
     f = [](double d) {
       return 1 / (1 + std::exp(-d));
     };
     break;
-  case FastSigmoid:
+  case Activation::FastSigmoid:
     f = [](double d) {
       return d / (1 + std::abs(d));
     };
     break;
-  case Tanh:
+  case Activation::Tanh:
     f = [](double d) {
       return std::tanh(d);
     };
