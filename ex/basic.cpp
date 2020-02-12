@@ -29,7 +29,7 @@ int main()
 
   // xor function
   auto f = [](const Matrix &m) {
-    auto flat = m.get_flattened();
+    auto flat = m.flatten();
     return (flat.front() == flat.back()) ? Matrix::from_array({0.0}) : Matrix::from_array({1.0});
   };
 

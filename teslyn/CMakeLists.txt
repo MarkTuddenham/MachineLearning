@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 
 add_library(Teslyn 
             core/matrix.cpp
+            core/tensor.cpp
             core/neural_network.cpp
             linalg/inversion.cpp
             utils/printer.cpp
@@ -32,7 +33,7 @@ endif()
 if(MSVC)
     target_compile_options(Teslyn
     PRIVATE
-        "/W4"
+        "/Wall"
     )
 else()
     if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")

@@ -10,7 +10,7 @@ namespace Teslyn::LinAlg
 Matrix pseudoinverse(const Matrix &t_m)
 {
     // Use the complex conjugate for complex numbers
-    Matrix m_transpose = t_m.transpose();
+    Matrix m_transpose = t_m.t();
 
     return _gaussian_elimination(m_transpose * t_m) * m_transpose;
 }
@@ -51,8 +51,8 @@ Matrix _gaussian_elimination(const Matrix &t_m)
     aug0 = aug0 - (m0[1] * aug1);
     m0 = m0 - (m0[1] * m1);
 
-    auto aug0_f = aug0.get_flattened();
-    auto aug1_f = aug1.get_flattened();
+    auto aug0_f = aug0.flatten();
+    auto aug1_f = aug1.flatten();
 
     auto m = std::vector<double>();
     m.reserve(aug0_f.size() + aug1_f.size());

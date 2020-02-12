@@ -71,14 +71,14 @@ void NeuralNetwork::backpropagation(const Matrix &t_inputs, const Matrix &t_targ
   //weight to output layers (H_N->O) are computed with a different node delta
   unsigned int N = m_layers.size() - 1;
   Matrix node_delta = (m_outs[N] - t_targets).hadamard(delta_activ(m_outs[N]));
-  w_e.insert(w_e.begin(), (m_outs[N - 1].transpose() * node_delta).hadamard(lr));
+  w_e.insert(w_e.begin(), (m_outs[N - 1].t() * node_delta).hadamard(lr));
   b_e.insert(b_e.begin(), node_delta.hadamard(lr));
 
   // loop to compute node deltas and weight error responsibilities from input to last hidden layer (I->H_[N-1])
   for (size_t i = m_layers.size() - 2; i > 0; --i)
   {
-    node_delta = (node_delta * m_weights[i].transpose()).hadamard(delta_activ(m_outs[i]));
-    w_e.insert(w_e.begin(), (m_outs[i - 1].transpose() * node_delta).hadamard(lr));
+    node_delta = (node_delta * m_weights[i].t()).hadamard(delta_activ(m_outs[i]));
+    w_e.insert(w_e.begin(), (m_outs[i - 1].t() * node_delta).hadamard(lr));
     b_e.insert(b_e.begin(), node_delta.hadamard(lr));
   }
 

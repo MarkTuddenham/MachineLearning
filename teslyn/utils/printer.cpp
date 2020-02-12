@@ -17,7 +17,7 @@ void print_matrix(const Matrix &m, int t_precision, std::ostream *t_op)
     *t_op << m.get_rows() << 'x' << m.get_cols() << " Matrix:\n";
     *t_op << std::setprecision(t_precision) << std::fixed;
 
-    std::vector<double> values = m.get_flattened();
+    std::vector<double> values = m.flatten();
 
     for (size_t i = 0; i < m.get_rows(); ++i)
     {

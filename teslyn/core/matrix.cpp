@@ -62,7 +62,7 @@ Matrix Matrix::multiply(const Matrix &t_m) const
     else
     {
       Matrix res(m_rows, t_m.m_cols);
-      Matrix mt = t_m.transpose();
+      Matrix mt = t_m.t();
       for (size_t i = 0; i < res.get_size(); ++i)
       {
         size_t first_start = m_cols * (i / t_m.m_cols);
@@ -81,7 +81,8 @@ Matrix Matrix::operator*(const Matrix &t_m) const
   return this->multiply(t_m);
 }
 
-Matrix Matrix::transpose(void) const
+// Transpose
+Matrix Matrix::t(void) const
 {
   Matrix t(m_cols, m_rows);
   for (size_t i = 0; i < t.get_size(); ++i)
@@ -175,7 +176,7 @@ Matrix Matrix::elementwise(const Matrix &t_m, std::function<double(double, doubl
   if (amIScalar || isOtherScalar)
   {
     // if other is scalar then swap
-    double n = amIScalar ? get_flattened()[0] : t_m.get_flattened()[0];
+    double n = amIScalar ? flatten()[0] : t_m.flatten()[0];
     size_t rows = amIScalar ? t_m.get_rows() : get_rows();
     size_t cols = amIScalar ? t_m.get_cols() : get_cols();
 
@@ -236,7 +237,7 @@ Matrix Matrix::zeros(size_t t_rows, size_t t_cols)
 }
 
 
-std::vector<double> Matrix::get_flattened(void) const
+std::vector<double> Matrix::flatten(void) const
 {
   return m_data;
 }
