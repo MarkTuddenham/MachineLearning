@@ -108,15 +108,23 @@ Tensor Tensor::operator[](const std::vector<std::optional<size_t>> &t_ind) const
     return slice;
 }
 
-// Tensor Tensor::multiply(const Tensor &t_m) const
-// {
-//     return Tensor();
-// }
+Tensor Tensor::mm(const Tensor &t_ten) const
+{
 
-// Tensor Tensor::operator*(const Tensor &t_m) const
-// {
-//     return Tensor();
-// }
+    //check dimensions
+    if (m_shape.back() != t_ten.m_shape.front())
+    {
+        throw std::invalid_argument("Internal dimensions of tensors do not match: N x " +
+                                    std::to_string(m_shape.back()) + " and " +
+                                    std::to_string(t_ten.m_shape.front()) + " x M");
+    }
+    return Tensor();
+}
+
+Tensor Tensor::operator*(const Tensor &t_ten) const
+{
+    return this->mm(t_ten);
+}
 
 // Tensor Tensor::add(const Tensor &) const
 // {

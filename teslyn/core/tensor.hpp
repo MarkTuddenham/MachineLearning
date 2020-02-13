@@ -24,11 +24,11 @@ public:
 
     Tensor operator[](const std::vector<std::optional<size_t>> &t_ind) const;
 
-    // Tensor multiply(const Tensor &t_m) const;
-    // Tensor operator*(const Tensor &t_m) const;
+    Tensor mm(const Tensor &t_ten) const;
+    Tensor operator*(const Tensor &t_ten) const;
 
-    // Tensor add(const Tensor &) const;
-    // Tensor operator+(const Tensor &t_m) const;
+    // Tensor add(const Tensor &t_ten) const;
+    // Tensor operator+(const Tensor &t_ten) const;
 
     void _reshape(std::initializer_list<size_t> t_shape);
     Tensor reshape(std::initializer_list<size_t> t_shape) const;
