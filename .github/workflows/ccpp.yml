@@ -11,11 +11,22 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Build - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
     - uses: actions/checkout@v1
-    - name: make build
-      run: make build
+      with:
+        submodules: recursive
+    - name: mkdir _build/
+      run: mkdir -p _build/
+    - name: setup cmake
+      working-directory: _build
+      run: cmake -DCMAKE_BUILD_TYPE=Release ..
+    - name: build
+      run: cmake --build _build/
 
   
   test:
@@ -23,13 +34,26 @@ jobs:
       runs-on: ${{ matrix.os }}
       strategy:
         matrix:
-          os: [ubuntu-latest]
+          os: [ubuntu-latest, windows-latest, macos-latest]
       steps:
-      - uses: actions/checkout@v1
+        - uses: actions/checkout@v1
+          with:
+            submodules: recursive
+      - name: mkdir _build/
+        run: mkdir -p _build/
+      - name: setup cmake
+        working-directory: _build
+        run: cmake -DCMAKE_BUILD_TYPE=Debug ..
+      - name: build
+        run: cmake --build _build/
+      - name: run tests (Windows)
+        if: runner.os == 'Windows'
+        run: .\bin\Debug\Tests.exe
+      - name: run tests (*nix)
+        if: runner.os != 'Windows'
+        run: ./bin/Tests
       - name: cppcheck
-        run: sudo apt-get install cppcheck && make check
-      - name: unit tests
-        run: LD_LIBRARY_PATH=$pwd make test
+        run: sudo apt-get install cppcheck && cppcheck --enable=all --inconclusive --suppress=missingIncludeSystem  --template=gcc  teslyn/ test/
       - name: lcov
         run: git clone https://github.com/linux-test-project/lcov.git && sudo make -C lcov install && sudo cpan JSON PerlIO::gzip && lcov -c -d . -o coverage.info --include "$(pwd)/*"
       - name: coveralls
