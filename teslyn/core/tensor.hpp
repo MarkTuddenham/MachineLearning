@@ -12,13 +12,17 @@ namespace Teslyn
 
 constexpr std::nullopt_t all = std::nullopt;
 
+// Yes, I know about templating but I don't want
+// to get into that yet.
+typedef double dtype;
+
 class Tensor
 {
 
 public:
-    Tensor(std::vector<size_t> t_shape, double t_fill = 0);
+    Tensor(std::initializer_list<size_t> t_shape, dtype t_fill = 0);
 
-    Tensor operator[](std::initializer_list<std::optional<size_t>> t_ind) const;
+    Tensor operator[](const std::vector<std::optional<size_t>> &t_ind) const;
 
     // Tensor multiply(const Tensor &t_m) const;
     // Tensor operator*(const Tensor &t_m) const;
@@ -26,8 +30,16 @@ public:
     // Tensor add(const Tensor &) const;
     // Tensor operator+(const Tensor &t_m) const;
 
-    std::vector<double> flatten() const;
+    void _reshape(std::initializer_list<size_t> t_shape);
+    Tensor reshape(std::initializer_list<size_t> t_shape) const;
+
+    std::vector<dtype> flatten() const;
     std::vector<size_t> get_shape() const;
+
+    dtype get(const std::vector<size_t> &t_ind) const;
+
+    // special constructors
+    static Tensor from(const std::initializer_list<dtype> t_data);
 
 private:
     Tensor();
@@ -35,9 +47,9 @@ private:
     size_t m_offset;
     std::vector<size_t> m_shape;
     std::vector<size_t> m_strides;
-    std::shared_ptr<std::vector<double>> m_data;
+    std::shared_ptr<std::vector<dtype>> m_data;
 
-    friend void print_tensor(const Tensor &, int, std::ostream *);
+    friend void print_tensor(const Tensor &t, int t_precision, std::ostream *t_op);
 };
 
 void print_tensor(const Tensor &t, int t_precision = 3, std::ostream *t_op = &std::cout);

@@ -12,26 +12,21 @@ Tensor::Tensor()
 {
 }
 
-Tensor::Tensor(std::vector<size_t> t_shape, double t_fill) : m_shape(t_shape), m_offset(0)
+Tensor::Tensor(std::initializer_list<size_t> t_shape, dtype t_fill) : m_offset(0)
 {
-    m_data = std::make_shared<std::vector<double>>(
-        std::vector<double>(
-            std::accumulate(t_shape.begin(), t_shape.end(), 1, std::multiplies<size_t>()),
+    m_data = std::make_shared<std::vector<dtype>>(
+        std::vector<dtype>(
+            std::accumulate(
+                t_shape.begin(),
+                t_shape.end(),
+                1,
+                std::multiplies<size_t>()),
             t_fill));
 
-    size_t sum = 1;
-    m_strides = std::vector<size_t>();
-    // m_strides.reserve(t_shape.size()); // Don't think this is needed as vector is short.
-    m_strides.push_back(sum);
-
-    for (auto iter = t_shape.begin(); iter != t_shape.end() - 1; ++iter)
-    {
-        sum *= *iter;
-        m_strides.push_back(sum);
-    }
+    _reshape(t_shape);
 }
 
-Tensor Tensor::operator[](std::initializer_list<std::optional<size_t>> t_ind) const
+Tensor Tensor::operator[](const std::vector<std::optional<size_t>> &t_ind) const
 {
 
     // TODO how to add slicing, e.g. allow whole dimension x[{0, :}]
@@ -42,66 +37,44 @@ Tensor Tensor::operator[](std::initializer_list<std::optional<size_t>> t_ind) co
     }
 
     // Data
-    Tensor slice = Tensor();
+    Tensor slice;
     slice.m_data = m_data;
     slice.m_strides = std::vector<size_t>();
     slice.m_shape = std::vector<size_t>();
     slice.m_offset = 0;
 
-    // Strides
-    std::vector<size_t> is_opt;
+    // Some Helpers
+    std::vector<size_t> ind_was_empty;
 
     std::transform(
-        t_ind.begin(),
-        t_ind.end(),
-        std::back_inserter(is_opt),
+        cbegin(t_ind),
+        cend(t_ind),
+        std::back_inserter(ind_was_empty),
         [](const std::optional<size_t> &size) {
-            return static_cast<size_t>(size.has_value());
+            return static_cast<size_t>(!size.has_value());
         });
-
-    // std::transform(
-    //     cbegin(t_ind),
-    //     cend(t_ind),
-    //     std::back_inserter(ind_opt_zero),
-    //     [](const std::optional<size_t> &size) {
-    //         return size.value_or(0);
-    //     });
-
-    std::transform(
-        is_opt.cbegin(),
-        is_opt.cend(),
-        m_strides.cbegin(),
-        std::back_inserter(slice.m_strides),
-        std::multiplies<size_t>());
-
-    slice.m_strides.erase(
-        std::remove(
-            slice.m_strides.begin(),
-            slice.m_strides.end(),
-            0),
-        slice.m_strides.end());
 
     // Shape
     std::transform(
-        is_opt.cbegin(),
-        is_opt.cend(),
+        cbegin(ind_was_empty),
+        cend(ind_was_empty),
         m_shape.cbegin(),
         std::back_inserter(slice.m_shape),
         std::multiplies<size_t>());
 
     slice.m_shape.erase(
         std::remove(
-            slice.m_shape.begin(),
-            slice.m_shape.end(),
+            begin(slice.m_shape),
+            end(slice.m_shape),
             0),
-        slice.m_shape.end());
+        end(slice.m_shape));
 
     // Offset
     std::vector<size_t> offset_ind;
 
     std::transform(
-        t_ind.begin(),
-        t_ind.end(),
+        cbegin(t_ind),
+        cend(t_ind),
         std::back_inserter(offset_ind),
         [](const std::optional<size_t> &size) {
             return size.value_or(0);
@@ -109,13 +82,28 @@ Tensor Tensor::operator[](std::initializer_list<std::optional<size_t>> t_ind) co
 
     std::vector<size_t> offsets;
     std::transform(
-        offset_ind.cbegin(),
-        offset_ind.cend(),
-        m_strides.cbegin(),
+        cbegin(offset_ind),
+        cend(offset_ind),
+        cbegin(m_strides),
         std::back_inserter(offsets),
         std::multiplies<size_t>());
 
-    slice.m_offset = m_offset + std::accumulate(offsets.cbegin(), offsets.cend(), 0);
+    slice.m_offset = m_offset + std::accumulate(cbegin(offsets), cend(offsets), 0);
+
+    // Strides
+    std::transform(
+        cbegin(ind_was_empty),
+        cend(ind_was_empty),
+        cbegin(m_strides),
+        std::back_inserter(slice.m_strides),
+        std::multiplies<size_t>());
+
+    slice.m_strides.erase(
+        std::remove(
+            begin(slice.m_strides),
+            end(slice.m_strides),
+            0),
+        end(slice.m_strides));
 
     return slice;
 }
@@ -140,7 +128,7 @@ Tensor Tensor::operator[](std::initializer_list<std::optional<size_t>> t_ind) co
 //     return Tensor();
 // }
 
-std::vector<double> Tensor::flatten() const
+std::vector<dtype> Tensor::flatten() const
 {
     // TODO only the data you can get to from the striding
     return *m_data;
@@ -149,6 +137,64 @@ std::vector<double> Tensor::flatten() const
 std::vector<size_t> Tensor::get_shape() const
 {
     return m_shape;
+}
+
+dtype Tensor::get(const std::vector<size_t> &t_ind) const
+{
+    std::vector<size_t> actual_ind;
+    std::transform(
+        cbegin(t_ind),
+        cend(t_ind),
+        cbegin(m_strides),
+        std::back_inserter(actual_ind),
+        std::multiplies<size_t>());
+
+    return m_data->at(m_offset + std::accumulate(cbegin(actual_ind), cend(actual_ind), 0));
+}
+
+void Tensor::_reshape(std::initializer_list<size_t> t_shape)
+{
+
+    m_shape = std::vector<size_t>(t_shape);
+    m_strides = std::vector<size_t>();
+
+    if (t_shape.size() == 1)
+    {
+        m_strides.push_back(1);
+    }
+    else
+    {
+        // If 2 or more dim then swap the first two strides.
+        // so defaut repr is rows x cols
+        size_t sum = m_shape.at(1);
+        m_strides.push_back(sum);
+        m_strides.push_back(1);
+
+        // Calculate the rest of the strides if there are any dims left
+        sum *= m_shape.at(0);
+        for (auto iter = cbegin(m_shape) + 2; iter != cend(m_shape); ++iter)
+        {
+            m_strides.push_back(sum);
+            sum *= *iter;
+        }
+    }
+}
+
+Tensor Tensor::reshape(std::initializer_list<size_t> t_shape) const
+{
+    Tensor t = *this;
+    t._reshape(t_shape);
+    return t;
+}
+
+Tensor Tensor::from(const std::initializer_list<dtype> t_data)
+{
+    Tensor t;
+    t.m_data = std::make_shared<std::vector<dtype>>(t_data);
+    t.m_strides = std::vector<size_t>({1});
+    t.m_shape = std::vector<size_t>({t_data.size()});
+    t.m_offset = 0;
+    return t;
 }
 
 void print_tensor(const Tensor &t, int t_precision, std::ostream *t_op)
@@ -167,17 +213,54 @@ void print_tensor(const Tensor &t, int t_precision, std::ostream *t_op)
 
     *t_op << std::setprecision(t_precision) << std::fixed;
 
-    for (double v : t.flatten())
+    if (t.m_shape.size() == 1)
     {
+        *t_op << "{";
 
-        // add extra space to account for minus sign
-        if (v >= 0)
-            *t_op << " ";
+        for (size_t x = 0; x < t.m_shape.at(0); ++x)
+        {
 
-        *t_op << v << ", ";
+            dtype val = t.get({x});
+
+            // add extra space to account for minus sign
+            if (val >= 0)
+                *t_op << " ";
+
+            *t_op << val << " ";
+        }
+        *t_op << "}\n";
+    }
+    else if (t.m_shape.size() == 2)
+    {
+        for (size_t x = 0; x < t.m_shape.at(0); ++x)
+        {
+            for (size_t y = 0; y < t.m_shape.at(1); ++y)
+            {
+                dtype val = t.get({x, y});
+
+                *t_op << " | ";
+
+                // add extra space to account for minus sign
+                if (val >= 0)
+                    *t_op << " ";
+
+                *t_op << val << " ";
+            }
+            *t_op << " |\n";
+        }
     }
 
-    *t_op << "\n\n";
+    // for (dtype v : t.flatten())
+    // {
+    //     // add extra space to account for minus sign
+    //     if (v >= 0)
+    //         *t_op << " ";
+
+    //     *t_op << v << ", ";
+    // }
+
+    // *t_op << "\n\n";
+    *t_op << "\n";
 }
 
 } // namespace Teslyn

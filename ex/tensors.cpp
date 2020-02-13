@@ -10,7 +10,7 @@ int main()
 {
     std::cout << "Tensors\n";
 
-    Tensor t = Tensor({2, 2}, 1);
+    Tensor t = Tensor::from({1, 2, 3, 4}).reshape({2, 2});
 
     print_tensor(t);
 
@@ -19,8 +19,11 @@ int main()
     print_tensor(t[{Teslyn::all, 0}]);
     print_tensor(t[{Teslyn::all, 1}]);
 
-    t = Tensor({2, 2, 3}, 1);
-    print_tensor(t[{Teslyn::all, 0, Teslyn::all}]); // FUUUUUUUU
-    // TODO using Teslyn::all gets rid of a dim instead of keeping it
-    // otherwise the offsets and actual values for strides look ok
+    std::cout << "~~~~~~~~~~~~~~~~~~\n\n";
+
+    t = Tensor::from({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}).reshape({2, 2, 3});
+    print_tensor(t);
+
+    print_tensor(t[{Teslyn::all, 1, 2}]);
+    print_tensor(t[{Teslyn::all, 1, Teslyn::all}]);
 };
