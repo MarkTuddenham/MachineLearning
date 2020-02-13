@@ -1,24 +1,27 @@
+#include <algorithm>
 #include <functional>
 #include <memory>
 #include <numeric>
 #include <optional>
+#include <stdexcept>
+#include <string>
 
 #include "teslyn/core/tensor.hpp"
 
 namespace Teslyn
 {
 
-Tensor::Tensor()
+Tensor::Tensor() : m_offset(0)
 {
 }
 
-Tensor::Tensor(std::initializer_list<size_t> t_shape, dtype t_fill) : m_offset(0)
+Tensor::Tensor(std::vector<size_t> t_shape, dtype t_fill) : m_offset(0)
 {
     m_data = std::make_shared<std::vector<dtype>>(
         std::vector<dtype>(
             std::accumulate(
-                t_shape.begin(),
-                t_shape.end(),
+                cbegin(t_shape),
+                cend(t_shape),
                 1,
                 std::multiplies<size_t>()),
             t_fill));
@@ -29,8 +32,8 @@ Tensor::Tensor(std::initializer_list<size_t> t_shape, dtype t_fill) : m_offset(0
 Tensor Tensor::operator[](const std::vector<std::optional<size_t>> &t_ind) const
 {
 
-    // TODO how to add slicing, e.g. allow whole dimension x[{0, :}]
-
+    // TODO and that all the indecies are in limits
+    // maybe just let it overflow
     if (t_ind.size() != m_shape.size())
     {
         // TODO throw error
@@ -41,9 +44,8 @@ Tensor Tensor::operator[](const std::vector<std::optional<size_t>> &t_ind) const
     slice.m_data = m_data;
     slice.m_strides = std::vector<size_t>();
     slice.m_shape = std::vector<size_t>();
-    slice.m_offset = 0;
 
-    // Some Helpers
+    // Helper Vectors
     std::vector<size_t> ind_was_empty;
 
     std::transform(
@@ -118,7 +120,66 @@ Tensor Tensor::mm(const Tensor &t_ten) const
                                     std::to_string(m_shape.back()) + " and " +
                                     std::to_string(t_ten.m_shape.front()) + " x M");
     }
-    return Tensor();
+
+    size_t shared_size = m_shape.back();
+
+ 
+    Tensor res;
+    res.m_shape = std::vector<size_t>();
+    res.m_strides = std::vector<size_t>();
+
+    res.m_shape.insert(begin(res.m_shape), cbegin(m_shape), std::prev(cend(m_shape)));
+    res.m_shape.insert(begin(res.m_shape), std::next(cbegin(t_ten.m_shape)), cend(t_ten.m_shape));
+
+    res._reshape(res.m_shape);
+
+    res.m_data = std::make_shared<std::vector<dtype>>(
+        std::vector<dtype>(
+            std::accumulate(
+                cbegin(res.m_shape),
+                cend(res.m_shape),
+                1,
+                std::multiplies<size_t>())));
+
+    // To do tensor multiplication we collapse the unecessary dims
+    // and then do matrix multiplication
+    // e.g. 2x2x3 @ 3x4x4 -> 4x3 @ 3x16
+    // then reshape to the outer dims
+
+    Tensor coll_self = this->reshape({
+        std::accumulate(
+            cbegin(m_shape),
+            std::prev(cend(m_shape)),
+            static_cast<size_t>(0)), 
+        shared_size});
+
+    Tensor coll_othr = this->reshape({
+        shared_size,
+        std::accumulate(
+            std::next(cbegin(t_ten.m_shape)),
+            cend(t_ten.m_shape),
+            static_cast<size_t>(0))});
+
+    //TODO need to loop over the product of the outer dims not shared_size
+    for (size_t i = 0; i < shared_size; ++i)
+    {
+
+        //size_t first_start = m_cols * (i / t_m.m_cols);
+        //size_t second_start = (i * mt.m_rows) % mt.get_size();
+
+        // TODO doesn't return the right arrays
+        auto self_row = coll_self.get_single(0, i);
+        auto oth_col = coll_othr.get_single(1, i);
+
+        (*res.m_data)[i] = std::inner_product(
+            cbegin(self_row),
+            cend(self_row),
+            cbegin(oth_col),
+            static_cast<dtype>(0));
+
+        std::cout << (*res.m_data)[i] << " ";
+    }
+    return res;
 }
 
 Tensor Tensor::operator*(const Tensor &t_ten) const
@@ -160,8 +221,11 @@ dtype Tensor::get(const std::vector<size_t> &t_ind) const
     return m_data->at(m_offset + std::accumulate(cbegin(actual_ind), cend(actual_ind), 0));
 }
 
-void Tensor::_reshape(std::initializer_list<size_t> t_shape)
+void Tensor::_reshape(std::vector<size_t> t_shape)
 {
+    // TODO I think this will totally break if the tensor is
+    // already a view of another one, i.e. the data for this tensor
+    // is not contiguous in m_data.
 
     m_shape = std::vector<size_t>(t_shape);
     m_strides = std::vector<size_t>();
@@ -180,7 +244,7 @@ void Tensor::_reshape(std::initializer_list<size_t> t_shape)
 
         // Calculate the rest of the strides if there are any dims left
         sum *= m_shape.at(0);
-        for (auto iter = cbegin(m_shape) + 2; iter != cend(m_shape); ++iter)
+        for (auto iter = std::next(cbegin(m_shape), 2); iter != cend(m_shape); ++iter)
         {
             m_strides.push_back(sum);
             sum *= *iter;
@@ -188,11 +252,24 @@ void Tensor::_reshape(std::initializer_list<size_t> t_shape)
     }
 }
 
-Tensor Tensor::reshape(std::initializer_list<size_t> t_shape) const
+Tensor Tensor::reshape(std::vector<size_t> t_shape) const
 {
     Tensor t = *this;
     t._reshape(t_shape);
     return t;
+}
+
+std::vector<dtype> Tensor::get_single(size_t dim, size_t ind) const
+{
+    std::vector<dtype> res;
+
+    // TODO not sure this is correct.
+    for (size_t i = m_strides.at(dim); i < m_shape.at(dim); i += m_strides.at(dim))
+    {
+        res.push_back(m_data->at(m_offset + i));
+    }
+
+    return res;
 }
 
 Tensor Tensor::from(const std::initializer_list<dtype> t_data)
