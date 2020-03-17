@@ -16,13 +16,19 @@ constexpr std::nullopt_t all = std::nullopt;
 // to get into that yet.
 typedef double dtype;
 
+typedef std::vector<dtype> _Data;
+typedef std::vector<size_t> Shape;
+typedef std::vector<size_t> Stride; // TODO is this really wanted?
+typedef std::vector<size_t> Index;
+typedef std::vector<std::optional<size_t>> PartIndex;
+
 class Tensor
 {
 
 public:
-    Tensor(std::vector<size_t> t_shape, dtype t_fill = 0);
+    Tensor(Shape t_shape, dtype t_fill = 0);
 
-    Tensor operator[](const std::vector<std::optional<size_t>> &t_ind) const;
+    Tensor operator[](const PartIndex &t_ind) const;
 
     Tensor mm(const Tensor &t_ten) const;
     Tensor operator*(const Tensor &t_ten) const;
@@ -30,13 +36,13 @@ public:
     // Tensor add(const Tensor &t_ten) const;
     // Tensor operator+(const Tensor &t_ten) const;
 
-    void _reshape(std::vector<size_t> t_shape);
-    Tensor reshape(std::vector<size_t> t_shape) const;
+    void _reshape(const Shape t_shape);
+    Tensor reshape(const Shape t_shape) const;
 
     std::vector<dtype> flatten() const;
-    std::vector<size_t> get_shape() const;
+    Shape get_shape() const;
 
-    dtype get(const std::vector<size_t> &t_ind) const;
+    dtype get(const Index &t_ind) const;
 
     // special constructors
     static Tensor from(const std::initializer_list<dtype> t_data);
@@ -45,11 +51,9 @@ private:
     Tensor();
 
     size_t m_offset;
-    std::vector<size_t> m_shape;
-    std::vector<size_t> m_strides;
-    std::shared_ptr<std::vector<dtype>> m_data;
-
-    std::vector<dtype> get_single(size_t dim, size_t ind) const;
+    Shape m_shape;
+    Stride m_strides;
+    std::shared_ptr<_Data> m_data;
 
     friend void print_tensor(const Tensor &t, int t_precision, std::ostream *t_op);
 };

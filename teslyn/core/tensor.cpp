@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <string>
 
+#include <iterator>
+
 #include "teslyn/core/tensor.hpp"
 
 namespace Teslyn
@@ -15,9 +17,9 @@ Tensor::Tensor() : m_offset(0)
 {
 }
 
-Tensor::Tensor(std::vector<size_t> t_shape, dtype t_fill) : m_offset(0)
+Tensor::Tensor(Shape t_shape, dtype t_fill) : m_offset(0)
 {
-    m_data = std::make_shared<std::vector<dtype>>(
+    m_data = std::make_shared<_Data>(
         std::vector<dtype>(
             std::accumulate(
                 cbegin(t_shape),
@@ -29,10 +31,10 @@ Tensor::Tensor(std::vector<size_t> t_shape, dtype t_fill) : m_offset(0)
     _reshape(t_shape);
 }
 
-Tensor Tensor::operator[](const std::vector<std::optional<size_t>> &t_ind) const
+Tensor Tensor::operator[](const PartIndex &t_ind) const
 {
 
-    // TODO and that all the indecies are in limits
+    // TODO and that all the indicies are in limits
     // maybe just let it overflow
     if (t_ind.size() != m_shape.size())
     {
@@ -42,11 +44,11 @@ Tensor Tensor::operator[](const std::vector<std::optional<size_t>> &t_ind) const
     // Data
     Tensor slice;
     slice.m_data = m_data;
-    slice.m_strides = std::vector<size_t>();
     slice.m_shape = std::vector<size_t>();
+    slice.m_strides = std::vector<size_t>();
 
     // Helper Vectors
-    std::vector<size_t> ind_was_empty;
+    Index ind_was_empty;
 
     std::transform(
         cbegin(t_ind),
@@ -72,7 +74,7 @@ Tensor Tensor::operator[](const std::vector<std::optional<size_t>> &t_ind) const
         end(slice.m_shape));
 
     // Offset
-    std::vector<size_t> offset_ind;
+    Index offset_ind;
 
     std::transform(
         cbegin(t_ind),
@@ -82,7 +84,7 @@ Tensor Tensor::operator[](const std::vector<std::optional<size_t>> &t_ind) const
             return size.value_or(0);
         });
 
-    std::vector<size_t> offsets;
+    Index offsets;
     std::transform(
         cbegin(offset_ind),
         cend(offset_ind),
@@ -123,62 +125,57 @@ Tensor Tensor::mm(const Tensor &t_ten) const
 
     size_t shared_size = m_shape.back();
 
- 
     Tensor res;
     res.m_shape = std::vector<size_t>();
     res.m_strides = std::vector<size_t>();
 
-    res.m_shape.insert(begin(res.m_shape), cbegin(m_shape), std::prev(cend(m_shape)));
-    res.m_shape.insert(begin(res.m_shape), std::next(cbegin(t_ten.m_shape)), cend(t_ten.m_shape));
-
+    res.m_shape.insert(end(res.m_shape), cbegin(m_shape), std::prev(cend(m_shape)));
+    res.m_shape.insert(end(res.m_shape), std::next(cbegin(t_ten.m_shape)), cend(t_ten.m_shape));
     res._reshape(res.m_shape);
 
-    res.m_data = std::make_shared<std::vector<dtype>>(
-        std::vector<dtype>(
-            std::accumulate(
-                cbegin(res.m_shape),
-                cend(res.m_shape),
-                1,
-                std::multiplies<size_t>())));
+    res.m_data = std::make_shared<_Data>(std::vector<dtype>(
+        std::accumulate(
+            cbegin(res.m_shape),
+            cend(res.m_shape),
+            1,
+            std::multiplies<size_t>())));
 
-    // To do tensor multiplication we collapse the unecessary dims
+    // To do tensor multiplication we collapse the unecessary
+    // leading and trailing dimensions
     // and then do matrix multiplication
     // e.g. 2x2x3 @ 3x4x4 -> 4x3 @ 3x16
     // then reshape to the outer dims
 
-    Tensor coll_self = this->reshape({
-        std::accumulate(
-            cbegin(m_shape),
-            std::prev(cend(m_shape)),
-            static_cast<size_t>(0)), 
-        shared_size});
+    Tensor collapsed_self = this->reshape({std::accumulate(
+                                               cbegin(m_shape),
+                                               std::prev(cend(m_shape)),
+                                               static_cast<size_t>(0)),
+                                           shared_size});
 
-    Tensor coll_othr = this->reshape({
-        shared_size,
-        std::accumulate(
-            std::next(cbegin(t_ten.m_shape)),
-            cend(t_ten.m_shape),
-            static_cast<size_t>(0))});
+    Tensor collapsed_other = t_ten.reshape({shared_size,
+                                            std::accumulate(
+                                                std::next(cbegin(t_ten.m_shape)),
+                                                cend(t_ten.m_shape),
+                                                static_cast<size_t>(0))});
 
-    //TODO need to loop over the product of the outer dims not shared_size
-    for (size_t i = 0; i < shared_size; ++i)
+    for (size_t j = 0; j < collapsed_other.m_shape.back(); ++j)
     {
+        for (size_t i = 0; i < collapsed_self.m_shape.front(); ++i)
+        {
 
-        //size_t first_start = m_cols * (i / t_m.m_cols);
-        //size_t second_start = (i * mt.m_rows) % mt.get_size();
+            auto self_row = collapsed_self[{i, all}].flatten();
+            auto other_col = collapsed_other[{all, j}].flatten();
 
-        // TODO doesn't return the right arrays
-        auto self_row = coll_self.get_single(0, i);
-        auto oth_col = coll_othr.get_single(1, i);
+            size_t data_ind = j + i * collapsed_other.m_shape.back();
 
-        (*res.m_data)[i] = std::inner_product(
-            cbegin(self_row),
-            cend(self_row),
-            cbegin(oth_col),
-            static_cast<dtype>(0));
-
-        std::cout << (*res.m_data)[i] << " ";
+            res.m_data->at(data_ind) = std::inner_product(
+                cbegin(self_row),
+                cend(self_row),
+                cbegin(other_col),
+                static_cast<dtype>(0));
+        }
     }
+
     return res;
 }
 
@@ -199,16 +196,35 @@ Tensor Tensor::operator*(const Tensor &t_ten) const
 
 std::vector<dtype> Tensor::flatten() const
 {
-    // TODO only the data you can get to from the striding
-    return *m_data;
+    size_t size = std::accumulate(cbegin(m_shape), cend(m_shape), 0);
+    std::vector<dtype> res;
+
+    std::vector<size_t> partial_sum;
+    partial_sum.emplace_back(1);
+    std::partial_sum(cbegin(m_shape), cend(m_shape), std::back_inserter(partial_sum));
+
+    for (size_t i = 0; i < size; ++i)
+    {
+
+        Index index;
+
+        for (size_t s = 0; s < m_shape.size(); ++s)
+        {
+            index.emplace_back((i / partial_sum.at(s)) % partial_sum.at(s + 1));
+        }
+
+        res.emplace_back(get(index));
+    }
+
+    return res;
 }
 
-std::vector<size_t> Tensor::get_shape() const
+Shape Tensor::get_shape() const
 {
     return m_shape;
 }
 
-dtype Tensor::get(const std::vector<size_t> &t_ind) const
+dtype Tensor::get(const Index &t_ind) const
 {
     std::vector<size_t> actual_ind;
     std::transform(
@@ -221,7 +237,7 @@ dtype Tensor::get(const std::vector<size_t> &t_ind) const
     return m_data->at(m_offset + std::accumulate(cbegin(actual_ind), cend(actual_ind), 0));
 }
 
-void Tensor::_reshape(std::vector<size_t> t_shape)
+void Tensor::_reshape(const Shape t_shape)
 {
     // TODO I think this will totally break if the tensor is
     // already a view of another one, i.e. the data for this tensor
@@ -252,24 +268,13 @@ void Tensor::_reshape(std::vector<size_t> t_shape)
     }
 }
 
-Tensor Tensor::reshape(std::vector<size_t> t_shape) const
+Tensor Tensor::reshape(const Shape t_shape) const
 {
+    // TODO allow partial shapes
+    // TODO check product of new shape is the same as the product of the old.
     Tensor t = *this;
     t._reshape(t_shape);
     return t;
-}
-
-std::vector<dtype> Tensor::get_single(size_t dim, size_t ind) const
-{
-    std::vector<dtype> res;
-
-    // TODO not sure this is correct.
-    for (size_t i = m_strides.at(dim); i < m_shape.at(dim); i += m_strides.at(dim))
-    {
-        res.push_back(m_data->at(m_offset + i));
-    }
-
-    return res;
 }
 
 Tensor Tensor::from(const std::initializer_list<dtype> t_data)
