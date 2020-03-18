@@ -18,7 +18,7 @@ Tensor::Tensor() : m_offset(0)
 {
 }
 
-Tensor::Tensor(Shape t_shape, dtype t_fill) : m_offset(0)
+Tensor::Tensor(const Shape &t_shape, dtype t_fill) : m_offset(0)
 {
     m_data = std::make_shared<_Data>(
         std::vector<dtype>(
@@ -160,12 +160,12 @@ Tensor Tensor::mm(const Tensor &t_ten) const
                                                 std::next(cbegin(t_ten.m_shape)),
                                                 cend(t_ten.m_shape),
                                                 static_cast<size_t>(0))});
-
     for (size_t j = 0; j < collapsed_other.m_shape.back(); ++j)
     {
         for (size_t i = 0; i < collapsed_self.m_shape.front(); ++i)
         {
 
+            //TODO create iterators and replace with that
             auto self_row = collapsed_self[{i, all}].flatten();
             auto other_col = collapsed_other[{all, j}].flatten();
 
@@ -244,7 +244,7 @@ dtype Tensor::get(const Index &t_ind) const
     return m_data->at(m_offset + std::accumulate(cbegin(actual_ind), cend(actual_ind), 0));
 }
 
-void Tensor::_reshape(const Shape t_shape)
+void Tensor::_reshape(const Shape &t_shape)
 {
     PROFILE_FUNCTION();
 
@@ -277,7 +277,7 @@ void Tensor::_reshape(const Shape t_shape)
     }
 }
 
-Tensor Tensor::reshape(const Shape t_shape) const
+Tensor Tensor::reshape(const Shape &t_shape) const
 {
     // TODO allow partial shapes
     // TODO check product of new shape is the same as the product of the old.
@@ -286,15 +286,32 @@ Tensor Tensor::reshape(const Shape t_shape) const
     return t;
 }
 
-Tensor Tensor::from(const std::initializer_list<dtype> t_data)
+Tensor Tensor::from(const std::vector<dtype> t_data)
 {
     Tensor t;
-    t.m_data = std::make_shared<std::vector<dtype>>(t_data);
+    t.m_data = std::make_shared<_Data>(t_data);
     t.m_strides = std::vector<size_t>({1});
     t.m_shape = std::vector<size_t>({t_data.size()});
     t.m_offset = 0;
     return t;
 }
+
+Tensor Tensor::zeros(const Shape &t_shape)
+{
+    return Tensor(t_shape, 0);
+}
+
+Tensor Tensor::ones(const Shape &t_shape)
+{
+    return Tensor(t_shape, 1);
+}
+
+bool Tensor::operator==(const Tensor &other) const
+{
+    return flatten() == other.flatten() &&
+           get_shape() == other.get_shape();
+}
+
 std::string Tensor::to_string(int t_precision) const
 {
     std::ostringstream ss;

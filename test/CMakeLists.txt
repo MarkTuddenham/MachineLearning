@@ -5,7 +5,7 @@ project(TeslynTests VERSION 0.1)
 # add the executable
 add_executable(TeslynTests 
     src/tests.cpp
-    # src/matrix.cpp
+    src/tensor.cpp
     # src/neural_network.cpp
     # src/display.cpp
 )

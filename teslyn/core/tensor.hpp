@@ -26,9 +26,11 @@ class Tensor
 {
 
 public:
-    Tensor(Shape t_shape, dtype t_fill = 0);
+    Tensor(const Shape &t_shape, dtype t_fill = 0);
 
     Tensor operator[](const PartIndex &t_ind) const;
+
+    bool operator==(const Tensor &other) const;
 
     Tensor mm(const Tensor &t_ten) const;
     Tensor operator*(const Tensor &t_ten) const;
@@ -36,8 +38,8 @@ public:
     // Tensor add(const Tensor &t_ten) const;
     // Tensor operator+(const Tensor &t_ten) const;
 
-    void _reshape(const Shape t_shape);
-    Tensor reshape(const Shape t_shape) const;
+    void _reshape(const Shape &t_shape);
+    Tensor reshape(const Shape &t_shape) const;
 
     std::vector<dtype> flatten() const;
     Shape get_shape() const;
@@ -45,7 +47,9 @@ public:
     dtype get(const Index &t_ind) const;
 
     // special constructors
-    static Tensor from(const std::initializer_list<dtype> t_data);
+    static Tensor from(const std::vector<dtype> t_data);
+    static Tensor zeros(const Shape &t_shape);
+    static Tensor ones(const Shape &t_shape);
 
     std::string to_string(int t_precision = 3) const;
 
