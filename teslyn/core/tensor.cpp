@@ -5,10 +5,11 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
-
-#include <iterator>
+#include <sstream>
 
 #include "teslyn/core/tensor.hpp"
+#include "teslyn/utils/instrumentation.hpp"
+#include "teslyn/utils/log.hpp"
 
 namespace Teslyn
 {
@@ -33,6 +34,7 @@ Tensor::Tensor(Shape t_shape, dtype t_fill) : m_offset(0)
 
 Tensor Tensor::operator[](const PartIndex &t_ind) const
 {
+    PROFILE_FUNCTION();
 
     // TODO and that all the indicies are in limits
     // maybe just let it overflow
@@ -114,6 +116,7 @@ Tensor Tensor::operator[](const PartIndex &t_ind) const
 
 Tensor Tensor::mm(const Tensor &t_ten) const
 {
+    PROFILE_FUNCTION();
 
     //check dimensions
     if (m_shape.back() != t_ten.m_shape.front())
@@ -196,6 +199,8 @@ Tensor Tensor::operator*(const Tensor &t_ten) const
 
 std::vector<dtype> Tensor::flatten() const
 {
+    PROFILE_FUNCTION();
+
     size_t size = std::accumulate(cbegin(m_shape), cend(m_shape), 0);
     std::vector<dtype> res;
 
@@ -226,6 +231,8 @@ Shape Tensor::get_shape() const
 
 dtype Tensor::get(const Index &t_ind) const
 {
+    PROFILE_FUNCTION();
+
     std::vector<size_t> actual_ind;
     std::transform(
         cbegin(t_ind),
@@ -239,6 +246,8 @@ dtype Tensor::get(const Index &t_ind) const
 
 void Tensor::_reshape(const Shape t_shape)
 {
+    PROFILE_FUNCTION();
+
     // TODO I think this will totally break if the tensor is
     // already a view of another one, i.e. the data for this tensor
     // is not contiguous in m_data.
@@ -286,71 +295,64 @@ Tensor Tensor::from(const std::initializer_list<dtype> t_data)
     t.m_offset = 0;
     return t;
 }
-
-void print_tensor(const Tensor &t, int t_precision, std::ostream *t_op)
+std::string Tensor::to_string(int t_precision) const
 {
-    *t_op << "Shape { ";
-    for (size_t d : t.get_shape())
-        *t_op << d << " ";
-    *t_op << "}\n";
+    std::ostringstream ss;
 
-    *t_op << "Strides { ";
-    for (size_t d : t.m_strides)
-        *t_op << d << " ";
-    *t_op << "}\n";
+    ss << "Shape { ";
+    for (size_t d : get_shape())
+        ss << d << " ";
+    ss << "}\n";
 
-    *t_op << "Offset: " << t.m_offset << "\n";
+    ss << "Strides { ";
+    for (size_t d : m_strides)
+        ss << d << " ";
+    ss << "}\n";
 
-    *t_op << std::setprecision(t_precision) << std::fixed;
+    ss << "Offset: " << m_offset << "\n";
 
-    if (t.m_shape.size() == 1)
+    ss << std::setprecision(t_precision) << std::fixed;
+
+    if (m_shape.size() == 1)
     {
-        *t_op << "{";
+        ss << "{";
 
-        for (size_t x = 0; x < t.m_shape.at(0); ++x)
+        for (size_t x = 0; x < m_shape.at(0); ++x)
         {
 
-            dtype val = t.get({x});
+            dtype val = get({x});
 
             // add extra space to account for minus sign
             if (val >= 0)
-                *t_op << " ";
+                ss << " ";
 
-            *t_op << val << " ";
+            ss << val << " ";
         }
-        *t_op << "}\n";
+        ss << "}\n";
     }
-    else if (t.m_shape.size() == 2)
+    else if (m_shape.size() == 2)
     {
-        for (size_t x = 0; x < t.m_shape.at(0); ++x)
+        for (size_t x = 0; x < m_shape.at(0); ++x)
         {
-            for (size_t y = 0; y < t.m_shape.at(1); ++y)
+            for (size_t y = 0; y < m_shape.at(1); ++y)
             {
-                dtype val = t.get({x, y});
+                dtype val = get({x, y});
 
-                *t_op << " | ";
+                ss << " | ";
 
                 // add extra space to account for minus sign
                 if (val >= 0)
-                    *t_op << " ";
+                    ss << " ";
 
-                *t_op << val << " ";
+                ss << val << " ";
             }
-            *t_op << " |\n";
+            ss << " |\n";
         }
     }
 
-    // for (dtype v : t.flatten())
-    // {
-    //     // add extra space to account for minus sign
-    //     if (v >= 0)
-    //         *t_op << " ";
+    ss << "\n";
 
-    //     *t_op << v << ", ";
-    // }
-
-    // *t_op << "\n\n";
-    *t_op << "\n";
+    return ss.str();
 }
 
 } // namespace Teslyn

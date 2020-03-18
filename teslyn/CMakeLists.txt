@@ -3,16 +3,13 @@ cmake_minimum_required(VERSION 3.10)
 #configure_file(config.hpp.in config.hpp)
 
 add_library(Teslyn 
-            core/matrix.cpp
             core/tensor.cpp
-            core/neural_network.cpp
-            linalg/inversion.cpp
-            utils/printer.cpp
-            utils/timer.cpp
+            utils/log.cpp
+            # core/neural_network.cpp
+            # linalg/inversion.cpp
             )
             
-#add_subdirectory(vendor/spdlog/)
-
+add_subdirectory(vendor/spdlog/)
 
 set(TARGET_COMPILE_DEFINITIONS "")
 set(TARGET_PRIVATE_LINK_LIBS "")
@@ -22,12 +19,12 @@ if (WIN32)
 elseif(UNIX)
     list(APPEND TARGET_COMPILE_DEFINITIONS "PLATFORM_LINUX")
 endif()
-target_compile_definitions(Teslyn PRIVATE ${TARGET_COMPILE_DEFINITIONS})
-
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     list(APPEND TARGET_COMPILE_DEFINITIONS "DEBUG" "PROFILING")
 endif()
+
+target_compile_definitions(Teslyn PRIVATE ${TARGET_COMPILE_DEFINITIONS})
 
 
 if(MSVC)
@@ -75,5 +72,5 @@ target_link_libraries(Teslyn
 PRIVATE
     ${TARGET_PRIVATE_LINK_LIBS}
 PUBLIC
-    #spdlog
+    spdlog
 )

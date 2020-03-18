@@ -12,7 +12,7 @@
 
 A from-scratch implementation of Neural Networks.
 
-This library is heavily based of PyTorch, in fact, I'd call it an abominably slow, unwieldy, and featureless clone.
+This library is heavily based of PyTorch, in fact, I'd call it an abominably slow, unwieldy, and featurefew clone.
 [This blog](http://blog.ezyang.com/2019/05/pytorch-internals/) on the internals of PyTorch gives a good explanation of some of the core concepts.
 
 ---

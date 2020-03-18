@@ -47,6 +47,8 @@ public:
     // special constructors
     static Tensor from(const std::initializer_list<dtype> t_data);
 
+    std::string to_string(int t_precision = 3) const;
+
 private:
     Tensor();
 
@@ -54,10 +56,6 @@ private:
     Shape m_shape;
     Stride m_strides;
     std::shared_ptr<_Data> m_data;
-
-    friend void print_tensor(const Tensor &t, int t_precision, std::ostream *t_op);
 };
-
-void print_tensor(const Tensor &t, int t_precision = 3, std::ostream *t_op = &std::cout);
 
 } // namespace Teslyn

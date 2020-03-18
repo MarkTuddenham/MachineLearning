@@ -5,6 +5,8 @@ build/
 _build/
 bin/
 
+results.json
+
 # lcov
 lcov/
 coverage.info
