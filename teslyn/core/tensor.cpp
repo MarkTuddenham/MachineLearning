@@ -1,38 +1,32 @@
+#include "teslyn/core/tensor.hpp"
+
+#include "teslyn/utils/instrumentation.hpp"
+#include "teslyn/utils/log.hpp"
+
 #include <algorithm>
 #include <functional>
 #include <memory>
 #include <numeric>
 #include <optional>
+#include <sstream>
 #include <stdexcept>
 #include <string>
-#include <sstream>
-
-#include "teslyn/core/tensor.hpp"
-#include "teslyn/utils/instrumentation.hpp"
-#include "teslyn/utils/log.hpp"
 
 namespace Teslyn
 {
 
-Tensor::Tensor() : m_offset(0)
-{
-}
+Tensor::Tensor() : m_offset(0) {}
 
-Tensor::Tensor(const Shape &t_shape, dtype t_fill) : m_offset(0)
+Tensor::Tensor(const Shape& t_shape, dtype t_fill) : m_offset(0)
 {
-    m_data = std::make_shared<_Data>(
-        std::vector<dtype>(
-            std::accumulate(
-                cbegin(t_shape),
-                cend(t_shape),
-                1,
-                std::multiplies<size_t>()),
-            t_fill));
+    m_data = std::make_shared<_Data>(std::vector<dtype>(
+        std::accumulate(cbegin(t_shape), cend(t_shape), 1, std::multiplies<size_t>()),
+        t_fill));
 
     _reshape(t_shape);
 }
 
-Tensor Tensor::operator[](const PartIndex &t_ind) const
+Tensor Tensor::operator[](const PartIndex& t_ind) const
 {
     PROFILE_FUNCTION();
 
@@ -56,9 +50,7 @@ Tensor Tensor::operator[](const PartIndex &t_ind) const
         cbegin(t_ind),
         cend(t_ind),
         std::back_inserter(ind_was_empty),
-        [](const std::optional<size_t> &size) {
-            return static_cast<size_t>(!size.has_value());
-        });
+        [](const std::optional<size_t>& size) { return static_cast<size_t>(!size.has_value()); });
 
     // Shape
     std::transform(
@@ -69,10 +61,7 @@ Tensor Tensor::operator[](const PartIndex &t_ind) const
         std::multiplies<size_t>());
 
     slice.m_shape.erase(
-        std::remove(
-            begin(slice.m_shape),
-            end(slice.m_shape),
-            0),
+        std::remove(begin(slice.m_shape), end(slice.m_shape), 0),
         end(slice.m_shape));
 
     // Offset
@@ -82,9 +71,7 @@ Tensor Tensor::operator[](const PartIndex &t_ind) const
         cbegin(t_ind),
         cend(t_ind),
         std::back_inserter(offset_ind),
-        [](const std::optional<size_t> &size) {
-            return size.value_or(0);
-        });
+        [](const std::optional<size_t>& size) { return size.value_or(0); });
 
     Index offsets;
     std::transform(
@@ -105,25 +92,22 @@ Tensor Tensor::operator[](const PartIndex &t_ind) const
         std::multiplies<size_t>());
 
     slice.m_strides.erase(
-        std::remove(
-            begin(slice.m_strides),
-            end(slice.m_strides),
-            0),
+        std::remove(begin(slice.m_strides), end(slice.m_strides), 0),
         end(slice.m_strides));
 
     return slice;
 }
 
-Tensor Tensor::mm(const Tensor &t_ten) const
+Tensor Tensor::mm(const Tensor& t_ten) const
 {
     PROFILE_FUNCTION();
 
-    //check dimensions
+    // check dimensions
     if (m_shape.back() != t_ten.m_shape.front())
     {
-        throw std::invalid_argument("Internal dimensions of tensors do not match: N x " +
-                                    std::to_string(m_shape.back()) + " and " +
-                                    std::to_string(t_ten.m_shape.front()) + " x M");
+        throw std::invalid_argument(
+            "Internal dimensions of tensors do not match: N x " + std::to_string(m_shape.back())
+            + " and " + std::to_string(t_ten.m_shape.front()) + " x M");
     }
 
     size_t shared_size = m_shape.back();
@@ -137,11 +121,7 @@ Tensor Tensor::mm(const Tensor &t_ten) const
     res._reshape(res.m_shape);
 
     res.m_data = std::make_shared<_Data>(std::vector<dtype>(
-        std::accumulate(
-            cbegin(res.m_shape),
-            cend(res.m_shape),
-            1,
-            std::multiplies<size_t>())));
+        std::accumulate(cbegin(res.m_shape), cend(res.m_shape), 1, std::multiplies<size_t>())));
 
     // To do tensor multiplication we collapse the unecessary
     // leading and trailing dimensions
@@ -149,11 +129,9 @@ Tensor Tensor::mm(const Tensor &t_ten) const
     // e.g. 2x2x3 @ 3x4x4 -> 4x3 @ 3x16
     // then reshape to the outer dims
 
-    Tensor collapsed_self = this->reshape({std::accumulate(
-                                               cbegin(m_shape),
-                                               std::prev(cend(m_shape)),
-                                               static_cast<size_t>(0)),
-                                           shared_size});
+    Tensor collapsed_self = this->reshape(
+        {std::accumulate(cbegin(m_shape), std::prev(cend(m_shape)), static_cast<size_t>(0)),
+         shared_size});
 
     Tensor collapsed_other = t_ten.reshape({shared_size,
                                             std::accumulate(
@@ -165,7 +143,7 @@ Tensor Tensor::mm(const Tensor &t_ten) const
         for (size_t i = 0; i < collapsed_self.m_shape.front(); ++i)
         {
 
-            //TODO create iterators and replace with that
+            // TODO create iterators and replace with that
             auto self_row = collapsed_self[{i, all}].flatten();
             auto other_col = collapsed_other[{all, j}].flatten();
 
@@ -182,10 +160,7 @@ Tensor Tensor::mm(const Tensor &t_ten) const
     return res;
 }
 
-Tensor Tensor::operator*(const Tensor &t_ten) const
-{
-    return this->mm(t_ten);
-}
+Tensor Tensor::operator*(const Tensor& t_ten) const { return this->mm(t_ten); }
 
 // Tensor Tensor::add(const Tensor &) const
 // {
@@ -224,12 +199,9 @@ std::vector<dtype> Tensor::flatten() const
     return res;
 }
 
-Shape Tensor::get_shape() const
-{
-    return m_shape;
-}
+Shape Tensor::get_shape() const { return m_shape; }
 
-dtype Tensor::get(const Index &t_ind) const
+dtype Tensor::get(const Index& t_ind) const
 {
     PROFILE_FUNCTION();
 
@@ -244,7 +216,7 @@ dtype Tensor::get(const Index &t_ind) const
     return m_data->at(m_offset + std::accumulate(cbegin(actual_ind), cend(actual_ind), 0));
 }
 
-void Tensor::_reshape(const Shape &t_shape)
+void Tensor::_reshape(const Shape& t_shape)
 {
     PROFILE_FUNCTION();
 
@@ -277,7 +249,7 @@ void Tensor::_reshape(const Shape &t_shape)
     }
 }
 
-Tensor Tensor::reshape(const Shape &t_shape) const
+Tensor Tensor::reshape(const Shape& t_shape) const
 {
     // TODO allow partial shapes
     // TODO check product of new shape is the same as the product of the old.
@@ -296,20 +268,13 @@ Tensor Tensor::from(const std::vector<dtype> t_data)
     return t;
 }
 
-Tensor Tensor::zeros(const Shape &t_shape)
-{
-    return Tensor(t_shape, 0);
-}
+Tensor Tensor::zeros(const Shape& t_shape) { return Tensor(t_shape, 0); }
 
-Tensor Tensor::ones(const Shape &t_shape)
-{
-    return Tensor(t_shape, 1);
-}
+Tensor Tensor::ones(const Shape& t_shape) { return Tensor(t_shape, 1); }
 
-bool Tensor::operator==(const Tensor &other) const
+bool Tensor::operator==(const Tensor& other) const
 {
-    return flatten() == other.flatten() &&
-           get_shape() == other.get_shape();
+    return flatten() == other.flatten() && get_shape() == other.get_shape();
 }
 
 std::string Tensor::to_string(int t_precision) const
@@ -317,12 +282,12 @@ std::string Tensor::to_string(int t_precision) const
     std::ostringstream ss;
 
     ss << "Shape { ";
-    for (size_t d : get_shape())
+    for (size_t d: get_shape())
         ss << d << " ";
     ss << "}\n";
 
     ss << "Strides { ";
-    for (size_t d : m_strides)
+    for (size_t d: m_strides)
         ss << d << " ";
     ss << "}\n";
 

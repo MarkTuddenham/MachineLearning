@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
-#include <iostream>
 #include <functional>
+#include <iostream>
+#include <vector>
 
 namespace Teslyn
 {
@@ -50,13 +50,12 @@ public:
     static Matrix I(size_t t_size);
 
 private:
-  size_t m_rows, m_cols;
-  std::vector<double> m_data;
-  std::string m_name;
+    size_t m_rows, m_cols;
+    std::vector<double> m_data;
+    std::string m_name;
 
-  size_t get_size() const;
-  Matrix elementwise(const Matrix &t_m, std::function<double(double, double)> t_f) const;
-
+    size_t get_size() const;
+    Matrix elementwise(const Matrix& t_m, std::function<double(double, double)> t_f) const;
 };
 
 } // namespace Teslyn

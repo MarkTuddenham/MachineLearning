@@ -6,30 +6,29 @@
 
 #pragma once
 
-#include <string>
-#include <chrono>
 #include <algorithm>
+#include <chrono>
 #include <fstream>
-
+#include <string>
 #include <thread>
 
 #ifdef PLATFORM_WINDOWS
-#define FUNC_NAME __FUNCSIG__
+    #define FUNC_NAME __FUNCSIG__
 #else
-#define FUNC_NAME __PRETTY_FUNCTION__
+    #define FUNC_NAME __PRETTY_FUNCTION__
 #endif
 
 #ifdef PROFILING
 
-#define TOKENPASTE(x, y) x##y
-#define TOKENPASTE_INDIRECT(x, y) TOKENPASTE(x, y)
-#define PROFILE_SCOPE(name) InstrumentationTimer TOKENPASTE_INDIRECT(timer, __LINE__)(name)
-#define PROFILE_FUNCTION() PROFILE_SCOPE(FUNC_NAME)
+    #define TOKENPASTE(x, y) x##y
+    #define TOKENPASTE_INDIRECT(x, y) TOKENPASTE(x, y)
+    #define PROFILE_SCOPE(name) InstrumentationTimer TOKENPASTE_INDIRECT(timer, __LINE__)(name)
+    #define PROFILE_FUNCTION() PROFILE_SCOPE(FUNC_NAME)
 
 #else
 
-#define PROFILE_SCOPE(name)
-#define PROFILE_FUNCTION()
+    #define PROFILE_SCOPE(name)
+    #define PROFILE_FUNCTION()
 
 #endif
 
@@ -48,17 +47,14 @@ struct InstrumentationSession
 class Instrumentor
 {
 private:
-    InstrumentationSession *m_CurrentSession;
+    InstrumentationSession* m_CurrentSession;
     std::ofstream m_OutputStream;
     int m_ProfileCount;
 
 public:
-    Instrumentor()
-        : m_CurrentSession(nullptr), m_ProfileCount(0)
-    {
-    }
+    Instrumentor() : m_CurrentSession(nullptr), m_ProfileCount(0) {}
 
-    void BeginSession(const std::string &name, const std::string &filepath = "results.json")
+    void BeginSession(const std::string& name, const std::string& filepath = "results.json")
     {
         m_OutputStream.open(filepath);
         WriteHeader();
@@ -74,7 +70,7 @@ public:
         m_ProfileCount = 0;
     }
 
-    void WriteProfile(const ProfileResult &result)
+    void WriteProfile(const ProfileResult& result)
     {
         if (m_ProfileCount++ > 0)
             m_OutputStream << ",";
@@ -107,9 +103,9 @@ public:
         m_OutputStream.flush();
     }
 
-    static Instrumentor &Get()
+    static Instrumentor& Get()
     {
-        static Instrumentor *instance = new Instrumentor();
+        static Instrumentor* instance = new Instrumentor();
         return *instance;
     }
 };
@@ -117,8 +113,7 @@ public:
 class InstrumentationTimer
 {
 public:
-    InstrumentationTimer(const char *name)
-        : m_Name(name), m_Stopped(false)
+    InstrumentationTimer(const char* name) : m_Name(name), m_Stopped(false)
     {
         m_StartTimepoint = std::chrono::high_resolution_clock::now();
     }
@@ -133,8 +128,12 @@ public:
     {
         auto endTimepoint = std::chrono::high_resolution_clock::now();
 
-        long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
-        long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
+        long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint)
+                              .time_since_epoch()
+                              .count();
+        long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint)
+                            .time_since_epoch()
+                            .count();
 
         uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
         Instrumentor::Get().WriteProfile({m_Name, start, end, threadID});
@@ -143,7 +142,7 @@ public:
     }
 
 private:
-    const char *m_Name;
+    const char* m_Name;
     std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTimepoint;
     bool m_Stopped;
 };

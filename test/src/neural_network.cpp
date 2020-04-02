@@ -1,8 +1,9 @@
-#include <catch.hpp>
-#include <cmath>
+#include "teslyn/core/neural_network.hpp"
 
 #include "teslyn/core/matrix.hpp"
-#include "teslyn/core/neural_network.hpp"
+
+#include <catch.hpp>
+#include <cmath>
 
 // #include "utils.hpp"
 

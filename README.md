@@ -15,7 +15,9 @@ A from-scratch implementation of Neural Networks.
 This library is heavily based of PyTorch, in fact, I'd call it an abominably slow, unwieldy, and featurefew clone.
 [This blog](http://blog.ezyang.com/2019/05/pytorch-internals/) on the internals of PyTorch gives a good explanation of some of the core concepts.
 
----
+## So why then?
+
+I realise using STL algorithms on lists of order 1 size is definitely not the most efficient way;<!-- is this true? --> but I want the code to be as easily readable as possible instead of truly fast.
 
 ## Build Process (Linux)
 
@@ -35,7 +37,7 @@ cmake --build _build/
 ./bin/TeslynTests
 
 # Run the example
-./bin/ex/basic
+./bin/ex/tensors
 ```
 
 ---

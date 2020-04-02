@@ -1,13 +1,14 @@
-#include <string>
+#include "teslyn/linalg/inversion.hpp"
 
 #include "teslyn/core/matrix.hpp"
-#include "teslyn/linalg/inversion.hpp"
+
+#include <string>
 
 namespace Teslyn::LinAlg
 {
 
 // Left pseudoinverse
-Matrix pseudoinverse(const Matrix &t_m)
+Matrix pseudoinverse(const Matrix& t_m)
 {
     // Use the complex conjugate for complex numbers
     Matrix m_transpose = t_m.t();
@@ -15,18 +16,17 @@ Matrix pseudoinverse(const Matrix &t_m)
     return _gaussian_elimination(m_transpose * t_m) * m_transpose;
 }
 
-Matrix inverse(const Matrix &t_m)
-{
-    return _gaussian_elimination(t_m);
-}
+Matrix inverse(const Matrix& t_m) { return _gaussian_elimination(t_m); }
 
-Matrix _gaussian_elimination(const Matrix &t_m)
+Matrix _gaussian_elimination(const Matrix& t_m)
 {
 
-    //check dimensions
+    // check dimensions
     if (t_m.get_rows() != t_m.get_cols())
     {
-        throw std::invalid_argument("Matrix is not square: (" + std::to_string(t_m.get_rows()) + 'x' + std::to_string(t_m.get_cols()) + ')');
+        throw std::invalid_argument(
+            "Matrix is not square: (" + std::to_string(t_m.get_rows()) + 'x'
+            + std::to_string(t_m.get_cols()) + ')');
     }
 
     unsigned int size = t_m.get_rows();

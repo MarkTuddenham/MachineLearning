@@ -1,9 +1,8 @@
-#include <catch.hpp>
-
-#include <numeric>
-#include <functional>
-
 #include "teslyn/core/tensor.hpp"
+
+#include <catch.hpp>
+#include <functional>
+#include <numeric>
 
 using Teslyn::Tensor;
 
@@ -102,7 +101,6 @@ TEST_CASE("Tensor from_array", "[Tensor]")
 // {
 //     //    TODO
 // }
-
 
 // TEST_CASE("Tensor Randomise", "[Tensor]")
 // {
