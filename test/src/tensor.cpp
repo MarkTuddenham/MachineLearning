@@ -8,80 +8,80 @@ using Teslyn::Tensor;
 
 TEST_CASE("Tensor Construction", "[Tensor]")
 {
-    size_t n_rows = 5, n_cols = 3;
-    std::vector<size_t> shape = {n_rows, n_cols};
+  size_t n_rows = 5, n_cols = 3;
+  std::vector<size_t> shape = {n_rows, n_cols};
 
-    SECTION("Constructor")
-    {
-        Tensor t = Tensor(shape, 1);
-        REQUIRE(t.get_shape().at(0) == n_rows);
-        REQUIRE(t.get_shape().at(1) == n_cols);
-    }
+  SECTION("Constructor")
+  {
+    Tensor t = Tensor(shape, 1);
+    REQUIRE(t.get_shape().at(0) == n_rows);
+    REQUIRE(t.get_shape().at(1) == n_cols);
+  }
 
-    SECTION("Tensor Zeros")
-    {
-        Tensor t_a = Tensor(shape, 0);
-        Tensor t_b = Tensor::zeros(shape);
+  SECTION("Tensor Zeros")
+  {
+    Tensor t_a = Tensor(shape, 0);
+    Tensor t_b = Tensor::zeros(shape);
 
-        REQUIRE(t_a == t_b);
-    }
+    REQUIRE(t_a == t_b);
+  }
 
-    SECTION("Tensor Ones")
-    {
-        Tensor t_a = Tensor(shape, 1);
-        Tensor t_b = Tensor::ones(shape);
+  SECTION("Tensor Ones")
+  {
+    Tensor t_a = Tensor(shape, 1);
+    Tensor t_b = Tensor::ones(shape);
 
-        REQUIRE(t_a == t_b);
-    }
+    REQUIRE(t_a == t_b);
+  }
 }
 TEST_CASE("Tensor Reshape", "[Tensor]")
 {
-    std::vector<size_t> a_shape = {6, 4};
-    std::vector<size_t> b_shape = {8, 3};
+  std::vector<size_t> a_shape = {6, 4};
+  std::vector<size_t> b_shape = {8, 3};
 
-    Tensor t_a = Tensor::ones(a_shape);
-    Tensor t_b = Tensor::ones(b_shape);
+  Tensor t_a = Tensor::ones(a_shape);
+  Tensor t_b = Tensor::ones(b_shape);
 
-    REQUIRE(t_a.reshape(b_shape) == t_b);
+  REQUIRE(t_a.reshape(b_shape) == t_b);
 
-    SECTION(" throws with inccorect dimensions")
-    {
-        b_shape.at(1)++;
-        REQUIRE_THROWS(t_a.reshape(b_shape));
-    }
+  SECTION(" throws with inccorect dimensions")
+  {
+    b_shape.at(1)++;
+    REQUIRE_THROWS(t_a.reshape(b_shape));
+  }
 }
 
 TEST_CASE("Tensor from_array", "[Tensor]")
 {
-    SECTION(" for 1D")
-    {
-        size_t n = 5;
-        double val = 3;
-        Tensor t_a = Tensor({n}, val);
-        std::vector<double> vec(n, val);
-        Tensor t_b = Tensor::from(vec);
+  SECTION(" for 1D")
+  {
+    size_t n = 5;
+    double val = 3;
+    Tensor t_a = Tensor({n}, val);
+    std::vector<double> vec(n, val);
+    Tensor t_b = Tensor::from(vec);
 
-        REQUIRE(t_a == t_b);
-    }
+    REQUIRE(t_a == t_b);
+  }
 
-    SECTION(" using reshape")
-    {
-        std::vector<size_t> shape = {3, 5};
-        double val = 3;
-        Tensor t_a = Tensor(shape, val);
+  SECTION(" using reshape")
+  {
+    std::vector<size_t> shape = {3, 5};
+    double val = 3;
+    Tensor t_a = Tensor(shape, val);
 
-        std::vector<double> vec(
-            std::accumulate(
-                cbegin(shape),
-                cend(shape),
-                static_cast<size_t>(1),
-                std::multiplies<size_t>()),
-            val);
+    std::vector<double> vec(
+        std::accumulate(
+            cbegin(shape),
+            cend(shape),
+            static_cast<size_t>(1),
+            std::multiplies<size_t>()),
+        val);
 
-        Tensor t_b = Tensor::from(vec).reshape(shape);
+    Tensor t_b = Tensor::from(vec).reshape(shape);
 
-        REQUIRE(t_a == t_b);
-    }
+    REQUIRE(t_a == t_b);
+  }
 }
 
 // TEST_CASE("Tensor Transpose", "[Tensor]")
